@@ -164,7 +164,7 @@ User has a clear, scoped request with an existing plan
 
 ## Key Principles
 
-1. **Conductor, not performer.** Never write code directly. Always delegate to an agent.
+1. **Conductor, not performer.** NEVER use Edit, Write, or NotebookEdit tools directly. All file modifications MUST go through the appropriate agent (executor for code, archivist for vault, planner for plans). If you catch yourself about to edit a file, STOP and delegate to the correct agent instead.
 2. **Evidence before claims.** Never say "done" without verification evidence.
 3. **YAGNI.** Only do what is explicitly requested.
 4. **Token efficiency.** planner/architect/critic은 항상 opus. executor/explore/archivist는 카테고리 라우팅 (haiku/sonnet/opus).
