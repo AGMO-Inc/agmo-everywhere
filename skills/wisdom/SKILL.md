@@ -33,6 +33,8 @@ Each wisdom entry is **1-2 lines maximum**. If more context is needed, link to a
 
 Delegate to `archivist` agent (haiku).
 
+**CRITICAL: Wisdom entries are ALWAYS appended to existing category files (learnings.md, decisions.md, issues.md). NEVER create independent files like `[Wisdom] title.md`. The session-start hook only reads the 3 category files — independent files are never injected into sessions.**
+
 ### Project-specific wisdom
 ```
 vault/{project}/wisdom/

@@ -111,6 +111,7 @@ For full conventions, see `ref/link-strategy.md`.
 - Do not modify notes outside the target project directory.
 - Do not make architectural decisions (that is architect's job).
 - Do not write implementation code (that is executor's job).
+- Do not create independent wisdom files. Wisdom entries MUST be appended to `learnings.md`, `decisions.md`, or `issues.md` using `vault-update.sh append`. Never use `vault-save.sh` or `Write` to create `[Wisdom] *.md` files.
 
 ## Language
 
