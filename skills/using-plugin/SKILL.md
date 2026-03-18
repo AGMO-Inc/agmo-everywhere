@@ -47,7 +47,7 @@ Invoke via the `Skill` tool with `agmo:skillname`.
 ### Obsidian
 | Skill | Invoke when... |
 |-------|---------------|
-| `save-plan` | (Legacy) 수동으로 플랜을 vault에 저장할 때. plan 스킬이 직접 저장하므로 자동 트리거되지 않음 |
+| `save-plan` | plan 스킬의 자동 저장이 누락되었을 때 수동 fallback. "플랜 저장", "save plan" |
 | `save-impl` | Implementation completed — save summary (auto-triggered post-impl) |
 | `save-note` | User wants to save a design, research, meeting note, or memo |
 | `vault-search` | User wants to find something in Obsidian vault |

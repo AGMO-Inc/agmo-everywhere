@@ -42,7 +42,7 @@ These are signals that verification has not been done.
 
 ## Freshness
 
-Evidence older than **5 minutes** must be re-collected. Do not reuse stale results.
+Re-collect evidence after each TODO completes. Never reuse results from a previous TODO or a previous session.
 
 ## Delegation
 

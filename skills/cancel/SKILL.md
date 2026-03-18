@@ -5,6 +5,10 @@ description: Use when the user wants to stop current execution. Triggers on "취
 
 # Cancel — Stop Active Execution
 
+## Limitation
+
+Claude Code cannot programmatically abort an Agent call that is already in flight. This skill stops the orchestrator from dispatching further TODOs and reports status after the currently running agent completes.
+
 ## Process
 
 1. Identify what is currently active (ralph loop, execute/ralph, parallel execution, plan-review loop)

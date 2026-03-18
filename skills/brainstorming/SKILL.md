@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Use when the user wants to explore an idea, design an approach, or think through a problem before implementing. Triggers on "만들어줘", "추가해줘", "구현해줘", "설계", "브레인스토밍", "아이디어".
+description: Use when the user wants to explore an idea, design an approach, or think through a problem before implementing. Triggers on "고민", "논의", "아이디어", "brs".
 ---
 
 # Brainstorming — From Idea to Design

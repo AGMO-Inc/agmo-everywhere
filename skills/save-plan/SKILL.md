@@ -1,9 +1,9 @@
 ---
 name: save-plan
-description: Use to save a plan to Obsidian vault. Auto-triggered at the end of the plan skill. Triggers on "플랜 저장", "save plan".
+description: Fallback for when the plan skill's auto-save fails or is skipped. Use to manually save a plan to Obsidian vault. Triggers on "플랜 저장", "save plan".
 ---
 
-> **⚠️ Legacy Skill** — 이 스킬은 레거시입니다. 일반적으로 plan 스킬이 직접 vault에 저장합니다. 수동으로 플랜을 저장할 때만 사용하세요.
+> plan 스킬의 자동 저장이 누락되었을 때 수동 fallback으로 사용한다. 일반적으로 plan 스킬이 직접 vault에 저장하므로 이 스킬이 자동 트리거되지는 않는다.
 
 # Save Plan — Plan to Obsidian Vault
 

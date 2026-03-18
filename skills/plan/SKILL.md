@@ -42,6 +42,7 @@ Each TODO must contain:
 ### TODO N: [Short title]
 - **What**: Exactly what to do (1-2 sentences)
 - **File(s)**: Exact file paths to create or modify
+- **Tags**: [frontend | ui | backend | config | test] (1개 이상 필수)
 - **Must NOT**: Explicit constraints
 - **Acceptance**: How to verify completion
 - **QA**: Concrete test scenario (exact inputs → expected outputs)

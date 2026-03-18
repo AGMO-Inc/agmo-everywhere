@@ -43,9 +43,9 @@ If a file is needed by multiple TODOs:
 Launch all independent TODOs as separate Agent tool calls in a single response:
 
 ```
-Agent(subagent_type="executor", model="sonnet", prompt="TODO 1...")
-Agent(subagent_type="executor", model="sonnet", prompt="TODO 2...")
-Agent(subagent_type="executor", model="haiku", prompt="TODO 3...")
+Agent(subagent_type="agmo:executor", model="sonnet", prompt="TODO 1...")
+Agent(subagent_type="agmo:executor", model="sonnet", prompt="TODO 2...")
+Agent(subagent_type="agmo:executor", model="haiku", prompt="TODO 3...")
 ```
 
 Claude Code executes these concurrently when issued in the same message.

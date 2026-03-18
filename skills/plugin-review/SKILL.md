@@ -11,6 +11,11 @@ Delegate to `architect` agent:
 
 ### 1. Parse Claude Code Transcripts
 
+**Quick start:** Run the bundled parsing script first:
+`bash scripts/parse-transcripts.sh --project-key "{project-key}" --days 30`
+
+This outputs a JSON summary of skills, agents, and tokens. Use this as the primary data source for analysis. The manual extraction steps below are for reference only.
+
 Transcripts are stored in JSONL format under `~/.claude/projects/{project-key}/`.
 
 **project-key derivation:** Replace every `/` in the project's absolute path with `-`.
