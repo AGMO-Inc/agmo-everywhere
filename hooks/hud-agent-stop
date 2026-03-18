@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Update HUD when a subagent stops — remove from active agents (session-isolated)
+set -euo pipefail
+
+# Read stdin for hook arguments
+INPUT=$(cat 2>/dev/null || echo "{}")
+
+# Extract session_id and compute session-specific state path
+AGMO_STATE_DIR="${AGMO_STATE_DIR:-${HOME}/.agmo/state}"
+SESSION_ID=$(echo "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
+if [ -n "$SESSION_ID" ]; then
+  STATE_FILE="${AGMO_STATE_DIR}/sessions/${SESSION_ID}/hud.json"
+else
+  STATE_FILE="${AGMO_STATE_DIR}/hud.json"
+fi
+
+# Extract agent name to remove
+AGENT_NAME=$(echo "$INPUT" | python3 -c "
+import json,sys
+try:
+  d=json.load(sys.stdin)
+  agent_type=d.get('subagent_type','') or d.get('agent_type','') or ''
+  if ':' in agent_type:
+    agent_type=agent_type.split(':',1)[1]
+  print(agent_type)
+except Exception: print('')
+" 2>/dev/null || echo "")
+
+# Remove one instance of this agent from the list
+export STATE_FILE AGENT_NAME
+if [ -n "$AGENT_NAME" ] && [ -f "$STATE_FILE" ]; then
+  python3 -c "
+import json,os
+sf=os.environ['STATE_FILE']
+an=os.environ['AGENT_NAME']
+with open(sf) as f:
+  d=json.load(f)
+agents=d.get('agents',[])
+# Remove first matching agent
+for i,a in enumerate(agents):
+  if a.get('name')==an:
+    agents.pop(i)
+    break
+d['agents']=agents
+with open(sf,'w') as f:
+  json.dump(d,f)
+" 2>/dev/null
+fi
+
+exit 0

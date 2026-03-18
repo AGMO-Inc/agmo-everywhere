@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# PostToolUse hook: remind orchestrator to save plan/impl if forgotten.
+# Only triggers once per pending save, at Skill tool boundaries.
+set -euo pipefail
+
+python3 -c "
+import json, sys, os
+
+try:
+    d = json.load(sys.stdin)
+except:
+    sys.exit(0)
+
+tool = d.get('tool_name', '') or d.get('toolName', '')
+
+# Only check at Skill tool boundaries (natural workflow transitions)
+if tool != 'Skill':
+    sys.exit(0)
+
+skill = d.get('tool_input', {}).get('skill', '')
+if ':' in skill:
+    skill = skill.split(':', 1)[1]
+
+# Don't remind when save-plan/save-impl is already being invoked
+if skill in ('save-plan', 'save-impl'):
+    sys.exit(0)
+
+sid = d.get('session_id', '')
+base = os.environ.get('AGMO_STATE_DIR', os.path.expanduser('~/.agmo/state'))
+sd = os.path.join(base, 'sessions', sid) if sid else base
+ss = os.path.join(sd, 'session-stats.json')
+try:
+    stats = json.load(open(ss))
+except:
+    sys.exit(0)
+
+skills = stats.get('skills', {})
+reminded = stats.get('save_reminded', {})
+
+reminders = []
+
+# plan now saves directly to vault via vault-save.sh, so save-plan reminder is no longer needed
+# (save-plan is legacy — only for manual use)
+
+# execute was used but save-impl wasn't, and we haven't reminded yet
+if skills.get('execute', 0) > 0 and skills.get('save-impl', 0) == 0 and not reminded.get('save-impl'):
+    reminders.append('execute 완료 후 agmo:save-impl이 아직 호출되지 않았습니다. 구현 요약을 Obsidian에 저장하세요.')
+    reminded['save-impl'] = True
+
+if not reminders:
+    sys.exit(0)
+
+# Persist reminded flags
+stats['save_reminded'] = reminded
+json.dump(stats, open(ss, 'w'))
+
+# Inject reminder via additionalContext
+msg = ' | '.join(reminders)
+print(json.dumps({
+    'hookSpecificOutput': {
+        'hookEventName': 'PostToolUse',
+        'additionalContext': f'[AGMO REMINDER] {msg}'
+    }
+}))
+" 2>/dev/null
+
+exit 0

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Update HUD when a subagent starts — session-isolated
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+UPDATE_HUD="${PLUGIN_ROOT}/hud/update-hud.sh"
+
+# Read stdin for hook arguments
+INPUT=$(cat 2>/dev/null || echo "{}")
+
+# Extract session_id and compute session-specific state path
+AGMO_STATE_DIR="${AGMO_STATE_DIR:-${HOME}/.agmo/state}"
+SESSION_ID=$(echo "$INPUT" | python3 -c "import json,sys; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
+if [ -n "$SESSION_ID" ]; then
+  STATE_FILE="${AGMO_STATE_DIR}/sessions/${SESSION_ID}/hud.json"
+else
+  STATE_FILE="${AGMO_STATE_DIR}/hud.json"
+fi
+mkdir -p "$(dirname "$STATE_FILE")"
+
+# Extract agent name and model (model from pending_agent_model in hud.json)
+AGENT_INFO=$(echo "$INPUT" | STATE_FILE="$STATE_FILE" python3 -c "
+import json,sys,os
+try:
+  d=json.load(sys.stdin)
+  agent_type=d.get('agent_type','') or d.get('subagent_type','') or 'unknown'
+  # Strip plugin prefix
+  if ':' in agent_type:
+    agent_type=agent_type.split(':',1)[1]
+  # Read pending model from hud.json (set by PreToolUse hook)
+  model=''
+  sf=os.environ.get('STATE_FILE','')
+  if sf:
+    try:
+      state=json.load(open(sf))
+      model=state.get('pending_agent_model','') or ''
+      # Clear pending model
+      state['pending_agent_model']=''
+      with open(sf,'w') as f: json.dump(state,f)
+    except Exception: pass
+  # Normalize model names
+  if 'haiku' in model: model='haiku'
+  elif 'sonnet' in model: model='sonnet'
+  elif 'opus' in model: model='opus'
+  else:
+    # Fallback: model-fixed agents
+    fixed={'architect':'opus','planner':'opus','critic':'opus'}
+    model=fixed.get(agent_type,'')
+  print(f'{agent_type}|{model}')
+except Exception: print('unknown|')
+" 2>/dev/null || echo "unknown|")
+
+AGENT_NAME=$(echo "$AGENT_INFO" | cut -d'|' -f1)
+AGENT_MODEL=$(echo "$AGENT_INFO" | cut -d'|' -f2)
+
+export AGENT_NAME AGENT_MODEL STATE_FILE
+
+if [ -f "$UPDATE_HUD" ]; then
+    bash "$UPDATE_HUD" agent-add "$AGENT_NAME" "$AGENT_MODEL"
+fi
+
+exit 0

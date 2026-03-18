@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Detect slash command skill invocations from UserPromptSubmit
+# Updates HUD state so slash-command skills appear in real-time
+set -euo pipefail
+
+python3 -c "
+import json,sys,os,re
+try:
+  d=json.load(sys.stdin)
+  prompt=d.get('prompt','')
+  sid=d.get('session_id','')
+  # Method 1: detect <command-name> tag in expanded content
+  m=re.search(r'<command-name>/?(?:agmo:)?(.+?)</command-name>',prompt)
+  if not m:
+    # Method 2: detect raw /skill-name input
+    m=re.match(r'^/(?:agmo:)?([a-z][-a-z0-9]*)',prompt.strip())
+  if not m: sys.exit(0)
+  skill=m.group(1)
+  base=os.environ.get('AGMO_STATE_DIR',os.path.expanduser('~/.agmo/state'))
+  sd=os.path.join(base,'sessions',sid) if sid else base
+  os.makedirs(sd,exist_ok=True)
+  sf=os.path.join(sd,'hud.json')
+  try: state=json.load(open(sf))
+  except Exception: state={'skill':'','category':'','agents':[],'ctx_pct':''}
+  state['skill']=skill
+  state['active_skill']=skill
+  with open(sf,'w') as f: json.dump(state,f)
+  # Update session-stats
+  ss=os.path.join(sd,'session-stats.json')
+  try:
+    stats=json.load(open(ss))
+    stats.setdefault('skills',{})[skill]=stats['skills'].get(skill,0)+1
+    with open(ss,'w') as f: json.dump(stats,f)
+  except Exception: pass
+except Exception: pass
+" 2>/dev/null
+
+exit 0

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Update HUD on PreToolUse — tracks active skill and pending agent model
+# Session-isolated: writes to ~/.agmo/state/sessions/{session_id}/hud.json
+set -euo pipefail
+
+python3 -c "
+import json,sys,os
+try:
+  d=json.load(sys.stdin)
+  tn=d.get('tool_name','') or d.get('toolName','')
+  sid=d.get('session_id','')
+  base=os.environ.get('AGMO_STATE_DIR',os.path.expanduser('~/.agmo/state'))
+  sd=os.path.join(base,'sessions',sid) if sid else base
+  os.makedirs(sd,exist_ok=True)
+  sf=os.path.join(sd,'hud.json')
+  try: state=json.load(open(sf))
+  except Exception: state={'skill':'','category':'','agents':[],'ctx_pct':''}
+  changed=False
+  # Track active skill
+  if tn=='Skill':
+    skill=d.get('tool_input',{}).get('skill','')
+    if ':' in skill: skill=skill.split(':',1)[1]
+    if skill:
+      state['skill']=skill
+      state['active_skill']=skill
+      changed=True
+      # Update session-stats
+      ss=os.path.join(sd,'session-stats.json')
+      try:
+        stats=json.load(open(ss))
+        stats.setdefault('skills',{})[skill]=stats['skills'].get(skill,0)+1
+        with open(ss,'w') as f: json.dump(stats,f)
+      except Exception: pass
+  # Capture pending agent model from Agent tool calls
+  elif tn=='Agent':
+    model=d.get('tool_input',{}).get('model','') or ''
+    state['pending_agent_model']=model
+    changed=True
+  if changed:
+    with open(sf,'w') as f: json.dump(state,f)
+except Exception: pass
+" 2>/dev/null
+
+exit 0

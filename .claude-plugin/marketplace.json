@@ -1,0 +1,18 @@
+{
+  "name": "agmo-local",
+  "description": "Local development marketplace for Agmo plugin",
+  "owner": {
+    "name": "Sungmin Cho"
+  },
+  "plugins": [
+    {
+      "name": "agmo",
+      "description": "Optimized Claude Code plugin with 5 core agents, 21 demand-loaded skills, Obsidian-centered workflow",
+      "version": "0.2.0",
+      "source": "./",
+      "author": {
+        "name": "Sungmin Cho"
+      }
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Read stdin first — stdin can only be read once
+INPUT=$(cat 2>/dev/null || echo "{}")
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+VAULT_ROOT="${AGMO_VAULT_ROOT:-${HOME}/sungmin}"
+MAX_WISDOM_CHARS=6000  # ~2000 tokens
+
+# Extract session_id early (INPUT already read at line 5)
+SESSION_ID=$(printf '%s' "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('session_id',''))" 2>/dev/null || echo "")
+AGMO_STATE_DIR="${AGMO_STATE_DIR:-${HOME}/.agmo/state}"
+if [ -n "$SESSION_ID" ]; then
+  SESSION_STATE_DIR="${AGMO_STATE_DIR}/sessions/${SESSION_ID}"
+else
+  SESSION_STATE_DIR="${AGMO_STATE_DIR}"
+fi
+mkdir -p "$SESSION_STATE_DIR"
+
+# Clear HUD state for new session
+UPDATE_HUD="${PLUGIN_ROOT}/hud/update-hud.sh"
+if [ -f "$UPDATE_HUD" ]; then
+  STATE_FILE="${SESSION_STATE_DIR}/hud.json" bash "$UPDATE_HUD" clear 2>/dev/null || true
+fi
+
+# Read plugin version and write to session hud.json
+PLUGIN_JSON="${PLUGIN_ROOT}/.claude-plugin/plugin.json"
+if [ -f "$PLUGIN_JSON" ]; then
+  PLUGIN_VERSION=$(PLUGIN_JSON="$PLUGIN_JSON" python3 -c "import json,os; print(json.load(open(os.environ['PLUGIN_JSON']))['version'])" 2>/dev/null || echo "")
+  if [ -n "$PLUGIN_VERSION" ]; then
+    HUD_JSON="${SESSION_STATE_DIR}/hud.json"
+    if [ -f "$HUD_JSON" ]; then
+      PLUGIN_VERSION="$PLUGIN_VERSION" HUD_JSON="$HUD_JSON" python3 -c "
+import json, os
+path = os.environ['HUD_JSON']
+with open(path, 'r') as f:
+    d = json.load(f)
+d['plugin_version'] = os.environ['PLUGIN_VERSION']
+with open(path, 'w') as f:
+    json.dump(d, f)
+" 2>/dev/null || true
+    else
+      PLUGIN_VERSION="$PLUGIN_VERSION" HUD_JSON="$HUD_JSON" python3 -c "
+import json, os
+path = os.environ['HUD_JSON']
+d = {'plugin_version': os.environ['PLUGIN_VERSION']}
+with open(path, 'w') as f:
+    json.dump(d, f)
+" 2>/dev/null || true
+    fi
+  fi
+fi
+
+# Read using-plugin skill content directly
+SKILL_FILE="${PLUGIN_ROOT}/skills/using-plugin/SKILL.md"
+SKILL_CONTENT=""
+if [ -f "$SKILL_FILE" ]; then
+  # Strip frontmatter (everything between first two ---)
+  SKILL_CONTENT=$(sed -n '/^---$/,/^---$/!p' "$SKILL_FILE")
+fi
+
+# Detect project from cwd
+PROJECT_NAME=""
+if git rev-parse --is-inside-work-tree &>/dev/null; then
+  PROJECT_NAME="$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")"
+else
+  PROJECT_NAME="$(basename "$PWD")"
+fi
+
+# Read wisdom files, respecting token budget
+wisdom_content=""
+chars_used=0
+
+read_wisdom_file() {
+  local file="$1"
+  local label="$2"
+  if [ -f "$file" ] && [ -s "$file" ]; then
+    local content
+    content="$(cat "$file")"
+    local content_len=${#content}
+    if [ $((chars_used + content_len + ${#label} + 4)) -le $MAX_WISDOM_CHARS ]; then
+      wisdom_content="${wisdom_content}### ${label}"$'\n'"${content}"$'\n\n'
+      chars_used=$((chars_used + content_len + ${#label} + 4))
+    fi
+  fi
+}
+
+# Project wisdom first (priority)
+if [ -n "$PROJECT_NAME" ] && [ -d "${VAULT_ROOT}/${PROJECT_NAME}/wisdom" ]; then
+  read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/learnings.md" "${PROJECT_NAME} — Learnings"
+  read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/decisions.md" "${PROJECT_NAME} — Decisions"
+  read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/issues.md" "${PROJECT_NAME} — Issues"
+fi
+
+# Shared wisdom (remaining budget)
+if [ -d "${VAULT_ROOT}/shared/wisdom" ]; then
+  read_wisdom_file "${VAULT_ROOT}/shared/wisdom/learnings.md" "Shared — Learnings"
+  read_wisdom_file "${VAULT_ROOT}/shared/wisdom/decisions.md" "Shared — Decisions"
+  read_wisdom_file "${VAULT_ROOT}/shared/wisdom/issues.md" "Shared — Issues"
+fi
+
+# Build full context: skill content + wisdom
+context="${SKILL_CONTENT}"
+
+if [ -n "$wisdom_content" ]; then
+  context="${context}"$'\n\n'"## Inherited Wisdom (${PROJECT_NAME})"$'\n\n'"${wisdom_content}"
+fi
+
+context="${context}"$'\n\n'"## Vault Configuration"$'\n'"AGMO_VAULT_ROOT=${VAULT_ROOT}"
+
+# Escape for JSON
+escaped_context=$(printf '%s' "$context" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null | sed 's/^"//;s/"$//')
+
+# Initialize session-stats.json (session_id already extracted above)
+{ python3 - "${SESSION_STATE_DIR}/session-stats.json" "$SESSION_ID" "$PROJECT_NAME" "$PWD" 2>/dev/null || true; } <<'PYEOF'
+import sys, json, os
+from datetime import datetime
+
+state_file = sys.argv[1]
+session_id = sys.argv[2]
+project = sys.argv[3]
+project_path = sys.argv[4]
+
+os.makedirs(os.path.dirname(state_file), exist_ok=True)
+
+data = {
+    "session_id": session_id,
+    "session_start": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+    "project": project,
+    "project_path": project_path,
+    "skills": {},
+    "save_reminded": {}
+}
+
+with open(state_file, "w") as f:
+    json.dump(data, f, indent=2)
+PYEOF
+
+cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "${escaped_context}"
+  }
+}
+EOF
+
+exit 0
