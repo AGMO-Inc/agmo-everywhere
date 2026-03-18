@@ -73,7 +73,7 @@ When `vault-save.sh` returns `DUPLICATE:{path}`:
 
 | Skill | Policy |
 |-------|--------|
-| **save-impl** | **Update mode**: `section-ensure "추가 구현"` → `section-append` with new content → `property-set status=done`. Do NOT ask user. |
+| **save-impl** | Return to orchestrator with the duplicate path. Orchestrator will ask user for confirmation. |
 | **save-plan** | Return to orchestrator with the duplicate path. Orchestrator will ask user for confirmation. |
 | **save-note** | Return to orchestrator with the duplicate path. Orchestrator will ask user for confirmation. |
 

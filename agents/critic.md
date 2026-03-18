@@ -50,7 +50,9 @@ Does the implementation match the plan/spec? Check each TODO's acceptance criter
 
 ```
 ## Review Summary
-Overall: APPROVE / REQUEST_CHANGES / REJECT
+Overall: APPROVE / REQUEST_CHANGES
+
+Judgment rule: APPROVE if zero CRITICAL findings. IMPORTANT/MINOR do not block approval — note them as recommendations.
 
 ## Findings
 ### CRITICAL

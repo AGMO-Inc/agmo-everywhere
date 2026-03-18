@@ -46,8 +46,17 @@ For each TODO (respecting dependency order):
 2. Executor completes the TODO and reports results
 
 3. Auto-trigger agmo:verification
-   - If FAIL → retry (up to 3 attempts)
-   - If 3 failures → auto-trigger agmo:debugging
+   - If FAIL → collect failure context (approach taken + verification judgment)
+   - Retry with accumulated feedback (up to 3 attempts):
+     Each retry prompt MUST include ALL prior failure context:
+     ```
+     이전 시도 #{N}:
+     - 접근법: {what was changed}
+     - 실패 원인: {verification judgment summary}
+     - 금지: 위 접근법 재시도
+     ```
+     (2nd retry includes attempt #1; 3rd retry includes attempts #1 + #2)
+   - If 3 failures → auto-trigger agmo:debugging (include all failure contexts)
    - If PASS → proceed to step 4
 
 4. Tag-based post-processing
@@ -62,7 +71,7 @@ For each TODO (respecting dependency order):
 
 ### 3. Parallel Execution
 
-If multiple TODOs are independent (no dependency, no shared files):
+If multiple TODOs are independent (no dependency, no shared files, and no import/export dependencies between their target files):
 - Invoke `agmo:parallel` to dispatch multiple executors concurrently
 - Each executor gets exclusive file ownership
 - Integration phase after parallel batch completes

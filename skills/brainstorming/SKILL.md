@@ -72,8 +72,8 @@ Once the user approves the design:
    - Return the vault path to the orchestrator
 
 2. **Complexity re-check** — determine the next step:
-   - **Light** (≤ 3 files, mechanical/config changes, no design decisions left) → skip plan, delegate to executor agent (sonnet) directly for implementation. Do NOT invoke execute skill.
-   - **Heavy** (4+ files, logic changes, design decisions remain) → invoke `agmo:plan` with the vault path: `Skill(skill="agmo:plan", args="--design-path {VAULT_PATH}")`
+   - **Light** (all changes are mechanical — renaming, config edits, pattern replication with no judgment calls) → skip plan, delegate to executor agent (sonnet) directly for implementation. Do NOT invoke execute skill.
+   - **Heavy** (any change requires design judgment — new logic, API design, error handling strategy, data model decisions) → invoke `agmo:plan` with the vault path: `Skill(skill="agmo:plan", args="--design-path {VAULT_PATH}")`
 3. If Heavy, ask: "구현 계획으로 넘어갈까?"
 
 ## Principles

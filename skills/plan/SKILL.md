@@ -56,6 +56,7 @@ Each TODO must contain:
 4. QA scenarios use concrete data ("test@example.com", not "[email]")
 5. Dependencies between TODOs are explicitly noted
 6. Independent TODOs are marked for potential parallel execution
+7. Actively identify indirect dependencies between TODOs — if their target files are connected by import/export relationships, mark them as dependent
 
 ### 4. Self-Review
 

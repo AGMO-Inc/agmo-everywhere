@@ -17,8 +17,19 @@ WHILE work remains:
   2. If pending → dispatch executor with category routing
   3. After each TODO → run verification
   4. If verification fails:
-     - Attempt fix (up to 3 times)
-     - If 3 failures → invoke debugging skill
+     - Collect failure context:
+       - Approach taken (1-line summary of what was changed)
+       - Failure reason (1-2 line verification judgment summary)
+     - Attempt fix with accumulated feedback (up to 3 times):
+       Each retry prompt MUST include ALL prior failure context:
+       ```
+       이전 시도 #{N}:
+       - 접근법: {what was changed}
+       - 실패 원인: {verification judgment summary}
+       - 금지: 위 접근법 재시도
+       ```
+       (2nd retry includes attempt #1; 3rd retry includes attempts #1 + #2)
+     - If 3 failures → invoke debugging skill (include all 3 failure contexts)
      - If debugging resolves → continue
      - If debugging fails → report to user, pause
   5. If all TODOs complete → run final verification (architect)

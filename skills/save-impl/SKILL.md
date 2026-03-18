@@ -19,11 +19,13 @@ Delegate to `archivist` agent (haiku):
    - Body includes: implementation summary, changed files, key implementation details, design decisions
 6. **Save** — `scripts/vault-save.sh --type impl --project {PROJECT} --title "{title}" --file /tmp/agmo-vault-{uuid}.md`
    - If `CREATED:` → proceed to step 7
-   - If `DUPLICATE:{path}` → **update mode**:
-     a. `scripts/vault-update.sh section-ensure --path {IMPL_REL_PATH} --section "추가 구현"`
-     b. `scripts/vault-update.sh section-append --path {IMPL_REL_PATH} --section "추가 구현" --content "{new implementation summary in markdown}"`
-     c. `scripts/vault-update.sh property-set --path {IMPL_REL_PATH} --key status --value done`
-     d. Skip steps 7-8 (index already has this entry), proceed to step 9-10
+   - If `DUPLICATE:{path}` → **return to orchestrator** with the duplicate path and new content summary. Orchestrator will ask user whether to update or skip.
+     - If user approves update:
+       a. `scripts/vault-update.sh section-ensure --path {IMPL_REL_PATH} --section "추가 구현"`
+       b. `scripts/vault-update.sh section-append --path {IMPL_REL_PATH} --section "추가 구현" --content "{new implementation summary in markdown}"`
+       c. `scripts/vault-update.sh property-set --path {IMPL_REL_PATH} --key status --value done`
+       d. Skip steps 7-8 (index already has this entry), proceed to step 9-10
+     - If user skips → proceed to step 9-10 without modifying the existing note
 7. **Bidirectional link** — if Plan note exists:
    - `scripts/vault-update.sh section-ensure --path {PLAN_REL_PATH} --section Implementations`
    - `scripts/vault-update.sh section-append --path {PLAN_REL_PATH} --section Implementations --content "- Impl: [[{IMPL_REL_PATH}]]"`
@@ -53,5 +55,5 @@ Archivist MUST NOT invent a creative title. The title must be traceable to its s
 
 ## Safety
 
-- On `DUPLICATE:`, use update mode (section-append) instead of overwriting. Never replace existing content.
+- On `DUPLICATE:`, return to orchestrator for user confirmation before updating. If user approves, use update mode (section-append) instead of overwriting. Never replace existing content.
 - Do not modify any note outside the target project's directory.

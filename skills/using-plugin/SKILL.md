@@ -17,8 +17,8 @@ Before processing any request, determine its weight:
 
 | Weight | Criteria | Action |
 |--------|----------|--------|
-| **Light** | Single file change, clear instruction, < 1 min work | Execute directly — no skill needed |
-| **Heavy** | Multiple files, unclear scope, requires design decisions | Invoke the appropriate skill below |
+| **Light** | Mechanical changes only — renaming, config edits, single-point fixes with no design judgment | Execute directly — no skill needed |
+| **Heavy** | Requires design judgment — new logic, unclear scope, error handling decisions, data model choices | Invoke the appropriate skill below |
 
 When in doubt, invoke a skill. If there is even a 1% chance a skill applies, load it.
 

@@ -24,7 +24,9 @@ Review the plan against:
 - [ ] Dependencies identified
 - [ ] No YAGNI violations
 
-Output: APPROVE or REQUEST_CHANGES with structured findings (CRITICAL / IMPORTANT / MINOR).
+Output structured findings (CRITICAL / IMPORTANT / MINOR), then judge:
+- **APPROVE** if zero CRITICAL findings remain — IMPORTANT and MINOR findings may still exist but do not block approval. Note them as recommendations in the approval.
+- **REQUEST_CHANGES** if any CRITICAL finding exists.
 
 ### Phase 2: User Feedback
 
@@ -42,7 +44,7 @@ If changes are needed, delegate to `planner` agent (complex category):
 
 Loop back to Phase 1 with the revised plan.
 
-**Max iterations: 5.** If not approved after 5 rounds, present the best version to the user with remaining concerns noted.
+**Max iterations: 5.** If CRITICAL findings persist after 5 rounds, present the best version to the user with remaining CRITICAL concerns noted and let the user decide whether to proceed or continue refining.
 
 ### Phase 5: Finalize
 

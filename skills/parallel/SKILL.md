@@ -17,6 +17,9 @@ From the TODO list, select TODOs that:
 - Have no dependency on each other
 - Do NOT modify the same files
 - Can be verified independently
+- Do NOT modify files connected by import/export chains (e.g., if TODO A modifies src/auth/service.ts which imports src/models/user.ts, and TODO B modifies src/models/user.ts, they are NOT parallel candidates)
+
+Files connected by import/export chains may break if modified concurrently, since each executor cannot see the other's changes.
 
 ### 2. Assign File Ownership
 
@@ -29,6 +32,7 @@ Executor C: owns src/utils/validation.ts
 ```
 
 **Rule**: No two executors may modify the same file.
+If files are connected by import/export relationships, assign them to the same executor or schedule their TODOs sequentially.
 
 ### 3. Handle Shared Files
 
@@ -53,9 +57,19 @@ Claude Code executes these concurrently when issued in the same message.
 ### 5. Integration Phase
 
 After all parallel agents complete:
-1. Verify no file conflicts occurred
+1. Verify no file conflicts occurred (check for overlapping modifications)
 2. Run build to check everything compiles together
-3. Run `agmo:verification` on the combined result
+3. Run tests for all modified areas
+4. Run `agmo:verification` on the combined result
+
+Build and tests (steps 2-3) are essential because parallel executors cannot see each other's changes — the integration phase is the first point where incompatibilities become visible.
+
+#### Fallback on Build/Test Failure
+
+If build or tests fail in steps 2-3:
+1. Discard all parallel changes (`git reset` to the pre-parallel snapshot)
+2. Re-execute the failing TODOs sequentially, following the execute skill's standard path (verification + retry + debugging)
+3. After sequential re-execution, repeat the Integration Phase from step 1
 
 ## Limits
 
