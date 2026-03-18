@@ -25,8 +25,6 @@ _slugify() {
   input="$(echo "$input" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
   # Remove filesystem-forbidden characters: / \ : * ? " < > |
   input="$(echo "$input" | sed 's/[\/\\:*?"<>|]//g')"
-  # Replace consecutive spaces with hyphen
-  input="$(echo "$input" | sed 's/[[:space:]][[:space:]]*/-/g')"
   echo "$input"
 }
 
