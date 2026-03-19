@@ -1,8 +1,18 @@
+<div align="center">
+
 # Agmo Everywhere
 
-Claude Code 플러그인 — 6개 에이전트, 22개 온디맨드 스킬, Obsidian 중심 워크플로우
+**Claude Code 플러그인 — 6개 에이전트, 22개 온디맨드 스킬, Obsidian 중심 워크플로우**
 
-**v0.3.6**
+[![Version](https://img.shields.io/badge/version-0.3.6-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.3.6)
+[![Agents](https://img.shields.io/badge/agents-6-green.svg)](#에이전트-agents)
+[![Skills](https://img.shields.io/badge/skills-22-orange.svg)](#스킬-카탈로그-skills)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
+[![Obsidian](https://img.shields.io/badge/hub-Obsidian-purple.svg)](#왜-obsidian인가-why-obsidian)
+
+*오케스트레이터가 전문 에이전트에게 위임하고, Obsidian vault에 모든 지식을 축적하는 Claude Code 플러그인*
+
+</div>
 
 ---
 
