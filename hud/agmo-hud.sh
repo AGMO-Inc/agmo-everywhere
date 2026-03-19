@@ -173,7 +173,16 @@ if [ -n "$BRANCH" ]; then
   PROJECT_LABEL="📂 ${PROJECT}(${BRANCH})"
 fi
 
-# Read effort level from Claude Code settings
+# Read model and effort from stdin JSON and settings
+MODEL_NAME=$(echo "$STDIN_JSON" | python3 -c "
+import json,sys
+try:
+  d=json.load(sys.stdin)
+  m=d.get('model',{})
+  print(m.get('display_name','') if isinstance(m,dict) else '')
+except Exception: print('')
+" 2>/dev/null || echo "")
+
 EFFORT=$(python3 -c "
 import json
 try:
@@ -185,9 +194,13 @@ except Exception: print('')
 if [ -n "$ACTIVE_SKILL_NAME" ]; then
   LINE2="${PROJECT_LABEL} | [${ACTIVE_SKILL_NAME}] ▸ ${ACTIVE_AGENTS}"
 else
-  ORCH_LABEL="orchestrator"
-  if [ -n "$EFFORT" ]; then
-    ORCH_LABEL="orchestrator:${EFFORT}"
+  ORCH_LABEL="Agriman"
+  if [ -n "$MODEL_NAME" ] && [ -n "$EFFORT" ]; then
+    ORCH_LABEL="Agriman:${MODEL_NAME}(${EFFORT})"
+  elif [ -n "$MODEL_NAME" ]; then
+    ORCH_LABEL="Agriman:${MODEL_NAME}"
+  elif [ -n "$EFFORT" ]; then
+    ORCH_LABEL="Agriman:(${EFFORT})"
   fi
   LINE2="${PROJECT_LABEL} | ${ORCH_LABEL}"
 fi
