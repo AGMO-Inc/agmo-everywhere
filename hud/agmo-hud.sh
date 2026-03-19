@@ -17,12 +17,15 @@ else
   STATE_DIR="${AGMO_STATE_DIR}"
 fi
 
-# --- Project name ---
+# --- Project name (parent/project) & branch ---
 PROJECT=""
+BRANCH=""
 if git rev-parse --is-inside-work-tree &>/dev/null; then
-  PROJECT="$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")"
+  _toplevel="$(git rev-parse --show-toplevel 2>/dev/null)"
+  PROJECT="$(basename "$(dirname "$_toplevel")")/$(basename "$_toplevel")"
+  BRANCH="$(git branch --show-current 2>/dev/null || echo "")"
 else
-  PROJECT="$(basename "$PWD")"
+  PROJECT="$(basename "$(dirname "$PWD")")/$(basename "$PWD")"
 fi
 
 # --- Active skill & agents (from state file) ---
@@ -164,13 +167,29 @@ CTX="${CTX:-0}"
 CTX_COLOR=$(color_by_pct "$CTX")
 LINE1="${LINE1} | 📐 ctx:${CTX_COLOR}${CTX}%${C_RESET}"
 
-LINE1="${LINE1} | 📂 ${PROJECT}"
+# Line 2: 📂 project(branch) | [active_skill] ▸ agents
+PROJECT_LABEL="📂 ${PROJECT}"
+if [ -n "$BRANCH" ]; then
+  PROJECT_LABEL="📂 ${PROJECT}(${BRANCH})"
+fi
 
-# Line 2: [active_skill] ▸ agents  (active_skill prefix shown only when set)
+# Read effort level from Claude Code settings
+EFFORT=$(python3 -c "
+import json
+try:
+  d=json.load(open('${HOME}/.claude/settings.json'))
+  print(d.get('effortLevel',''))
+except Exception: print('')
+" 2>/dev/null || echo "")
+
 if [ -n "$ACTIVE_SKILL_NAME" ]; then
-  LINE2="[${ACTIVE_SKILL_NAME}] ▸ ${ACTIVE_AGENTS}"
+  LINE2="${PROJECT_LABEL} | [${ACTIVE_SKILL_NAME}] ▸ ${ACTIVE_AGENTS}"
 else
-  LINE2="▸ ${ACTIVE_AGENTS}"
+  ORCH_LABEL="orchestrator"
+  if [ -n "$EFFORT" ]; then
+    ORCH_LABEL="orchestrator:${EFFORT}"
+  fi
+  LINE2="${PROJECT_LABEL} | ${ORCH_LABEL}"
 fi
 
 echo "${LINE1}"
