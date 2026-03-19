@@ -3,7 +3,23 @@
 # Usage: source this file, do not execute directly
 
 _vault_root() {
-  echo "${AGMO_VAULT_ROOT:-/Users/sungmincho/sungmin}"
+  # Priority 1: environment variable
+  if [ -n "${AGMO_VAULT_ROOT:-}" ]; then
+    echo "$AGMO_VAULT_ROOT"
+    return
+  fi
+  # Priority 2: ~/.agmo/config JSON field "vault_root"
+  local config_path="$HOME/.agmo/config"
+  if [ -f "$config_path" ]; then
+    local val
+    val=$(python3 -c "import json; print(json.load(open('$config_path')).get('vault_root',''))" 2>/dev/null || echo "")
+    if [ -n "$val" ]; then
+      echo "$val"
+      return
+    fi
+  fi
+  # Priority 3: empty string
+  echo ""
 }
 
 _ensure_dir() {

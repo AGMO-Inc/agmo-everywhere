@@ -19,7 +19,7 @@ This outputs a JSON summary of skills, agents, and tokens. Use this as the prima
 Transcripts are stored in JSONL format under `~/.claude/projects/{project-key}/`.
 
 **project-key derivation:** Replace every `/` in the project's absolute path with `-`.
-Example: `/Users/sungmincho/Desktop/Backend/agmo-everywhere` → `-Users-sungmincho-Desktop-Backend-agmo-everywhere`
+Example: `/home/user/projects/my-project` → `-home-user-projects-my-project`
 
 **Main session transcripts:**
 `~/.claude/projects/{project-key}/{session-id}.jsonl`

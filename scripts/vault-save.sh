@@ -68,6 +68,10 @@ fi
 # --- Build paths ---
 FILENAME="$(_slugify "${PREFIX} ${TITLE}").md"
 VAULT_ROOT="$(_vault_root)"
+if [[ -z "$VAULT_ROOT" ]]; then
+  echo "[ERROR] Vault not configured. Run: agmo:setup" >&2
+  exit 1
+fi
 TARGET_DIR="${VAULT_ROOT}/${PROJECT}/${SUBDIR}"
 TARGET_PATH="${TARGET_DIR}/${FILENAME}"
 

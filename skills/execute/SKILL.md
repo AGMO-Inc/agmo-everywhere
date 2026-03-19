@@ -22,7 +22,7 @@ Read the plan from the vault path provided via skill args (e.g., `--plan-path {V
 **Path resolution:**
 1. If `--plan-path` is provided in args → Read the plan directly using Read tool from the vault path
    - The vault path format is an absolute path, e.g.: `agmo-everywhere/plans/[Plan]-제목.md`
-   - Resolve to full path: `{AGMO_VAULT_ROOT}/{vault_path}` (e.g., `/Users/sungmincho/sungmin/agmo-everywhere/plans/[Plan]-제목.md`)
+   - Resolve to full path: `{AGMO_VAULT_ROOT}/{vault_path}` (e.g., `{AGMO_VAULT_ROOT}/agmo-everywhere/plans/[Plan]-제목.md`)
 2. If no path provided → invoke `agmo:vault-search` to find the most recent plan for the current project
 3. If Read fails (file not found) → invoke `agmo:vault-search` as fallback
 

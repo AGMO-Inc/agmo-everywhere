@@ -7,8 +7,25 @@ INPUT=$(cat 2>/dev/null || echo "{}")
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-VAULT_ROOT="${AGMO_VAULT_ROOT:-${HOME}/sungmin}"
+source "${PLUGIN_ROOT}/scripts/obsidian-common.sh"
+VAULT_ROOT=$(_vault_root || true)
 MAX_WISDOM_CHARS=6000  # ~2000 tokens
+
+# Check Obsidian installation
+obsidian_warning=""
+if [ ! -d "/Applications/Obsidian.app" ]; then
+  if ! mdfind "kMDItemCFBundleIdentifier == 'md.obsidian'" 2>/dev/null | grep -q .; then
+    obsidian_warning="Warning: Obsidian app not found. Install Obsidian to enable vault features."
+  fi
+fi
+
+# Check vault configuration
+vault_warning=""
+if [ -z "$VAULT_ROOT" ]; then
+  vault_warning="Vault not configured. Run setup skill."
+elif [ ! -d "$VAULT_ROOT" ]; then
+  vault_warning="Vault path not found: ${VAULT_ROOT}"
+fi
 
 # Extract session_id early (INPUT already read at line 5)
 SESSION_ID=$(printf '%s' "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('session_id',''))" 2>/dev/null || echo "")
@@ -88,18 +105,20 @@ read_wisdom_file() {
   fi
 }
 
-# Project wisdom first (priority)
-if [ -n "$PROJECT_NAME" ] && [ -d "${VAULT_ROOT}/${PROJECT_NAME}/wisdom" ]; then
-  read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/learnings.md" "${PROJECT_NAME} — Learnings"
-  read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/decisions.md" "${PROJECT_NAME} — Decisions"
-  read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/issues.md" "${PROJECT_NAME} — Issues"
-fi
+if [[ -n "$VAULT_ROOT" && -d "$VAULT_ROOT" ]]; then
+  # Project wisdom first (priority)
+  if [ -n "$PROJECT_NAME" ] && [ -d "${VAULT_ROOT}/${PROJECT_NAME}/wisdom" ]; then
+    read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/learnings.md" "${PROJECT_NAME} — Learnings"
+    read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/decisions.md" "${PROJECT_NAME} — Decisions"
+    read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/issues.md" "${PROJECT_NAME} — Issues"
+  fi
 
-# Shared wisdom (remaining budget)
-if [ -d "${VAULT_ROOT}/shared/wisdom" ]; then
-  read_wisdom_file "${VAULT_ROOT}/shared/wisdom/learnings.md" "Shared — Learnings"
-  read_wisdom_file "${VAULT_ROOT}/shared/wisdom/decisions.md" "Shared — Decisions"
-  read_wisdom_file "${VAULT_ROOT}/shared/wisdom/issues.md" "Shared — Issues"
+  # Shared wisdom (remaining budget)
+  if [ -d "${VAULT_ROOT}/shared/wisdom" ]; then
+    read_wisdom_file "${VAULT_ROOT}/shared/wisdom/learnings.md" "Shared — Learnings"
+    read_wisdom_file "${VAULT_ROOT}/shared/wisdom/decisions.md" "Shared — Decisions"
+    read_wisdom_file "${VAULT_ROOT}/shared/wisdom/issues.md" "Shared — Issues"
+  fi
 fi
 
 # Build full context: skill content + wisdom
@@ -110,6 +129,14 @@ if [ -n "$wisdom_content" ]; then
 fi
 
 context="${context}"$'\n\n'"## Vault Configuration"$'\n'"AGMO_VAULT_ROOT=${VAULT_ROOT}"
+
+if [ -n "$obsidian_warning" ]; then
+  context="${context}"$'\n'"${obsidian_warning}"
+fi
+
+if [ -n "$vault_warning" ]; then
+  context="${context}"$'\n'"${vault_warning}"
+fi
 
 # Escape for JSON
 escaped_context=$(printf '%s' "$context" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null | sed 's/^"//;s/"$//')

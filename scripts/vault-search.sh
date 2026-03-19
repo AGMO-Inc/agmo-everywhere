@@ -28,6 +28,10 @@ if [[ -z "$QUERY" ]]; then
 fi
 
 VAULT_ROOT="$(_vault_root)"
+if [[ -z "$VAULT_ROOT" ]]; then
+  echo "[ERROR] Vault not configured. Run: agmo:setup" >&2
+  exit 1
+fi
 
 # --- Primary: obsidian CLI search ---
 OBS_RESULT=""

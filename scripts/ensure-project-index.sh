@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 # Ensure project index note exists in Obsidian vault
 # Usage: ensure-project-index.sh <PROJECT> <OWNER> [VAULT_ROOT]
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/obsidian-common.sh"
+
 PROJECT="$1"
 OWNER="$2"
-VAULT_ROOT="${3:-${AGMO_VAULT_ROOT:-}}"
+VAULT_ROOT="${3:-$(_vault_root)}"
+
+if [ -z "$VAULT_ROOT" ]; then
+  _log ERROR "VAULT_ROOT is empty. Set AGMO_VAULT_ROOT env var or provide 3rd argument"
+  exit 1
+fi
+
 INDEX_FILE="${VAULT_ROOT}/${PROJECT}/${PROJECT}.md"
 
 if [ -f "$INDEX_FILE" ]; then

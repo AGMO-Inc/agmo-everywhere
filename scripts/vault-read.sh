@@ -90,6 +90,13 @@ _cmd_backlinks() {
   fi
 }
 
+# --- Vault root guard ---
+VAULT_ROOT="$(_vault_root)"
+if [[ -z "$VAULT_ROOT" ]]; then
+  echo "[ERROR] Vault not configured. Run: agmo:setup" >&2
+  exit 1
+fi
+
 # --- Subcommand dispatch ---
 
 if [[ $# -lt 1 ]]; then
