@@ -28,7 +28,7 @@ claude plugin install agmo
 
 # 3. 초기 설정 (새 세션 시작 후)
 # Claude Code에서 아래와 같이 입력
-setup
+/setup
 ```
 
 `setup` 실행 시 다음 작업이 자동으로 수행됩니다.
