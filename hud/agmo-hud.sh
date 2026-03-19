@@ -202,7 +202,11 @@ else
   elif [ -n "$EFFORT" ]; then
     ORCH_LABEL="Agriman:(${EFFORT})"
   fi
-  LINE2="${PROJECT_LABEL} | ${ORCH_LABEL}"
+  if [ "$ACTIVE_AGENTS" != "-" ] && [ -n "$ACTIVE_AGENTS" ]; then
+    LINE2="${PROJECT_LABEL} | ${ORCH_LABEL} ▸ ${ACTIVE_AGENTS}"
+  else
+    LINE2="${PROJECT_LABEL} | ${ORCH_LABEL}"
+  fi
 fi
 
 echo "${LINE1}"
