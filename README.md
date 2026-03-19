@@ -1,4 +1,4 @@
-# Agmo
+# Agmo Everywhere
 
 Claude Code 플러그인 — 6개 에이전트, 22개 온디맨드 스킬, Obsidian 중심 워크플로우
 
