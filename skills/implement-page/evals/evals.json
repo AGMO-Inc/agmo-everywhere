@@ -1,0 +1,29 @@
+{
+  "skill_name": "implement-page",
+  "evals": [
+    {
+      "id": 1,
+      "name": "landing-page-full-flow",
+      "prompt": "이 피그마 페이지 구현해줘. https://figma.com/design/abc123def/LandingPage?node-id=1-2 프로젝트는 Next.js + Tailwind인데, 개발서버는 npm run dev로 localhost:3000에서 돌아가고 있어. 라우트는 /landing이야.",
+      "expected_output": "Phase 1 frame discovery → Phase 2 per-frame loop (explore→executor→frontend visual) → Phase 3 final verification with agmo:frontend",
+      "assertions": [],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "minimal-input-dashboard",
+      "prompt": "https://figma.com/design/xyz789/Dashboard?node-id=10-5 이거 구현해줘.",
+      "expected_output": "Should ask for missing info (dev server command, URL, route) before starting. Then follow full orchestration flow.",
+      "assertions": [],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "responsive-request",
+      "prompt": "피그마 랜딩페이지 구현해줘. https://figma.com/design/abc123def/Mobile-Landing?node-id=3-0 반응형도 확인해줘. 개발서버 npm run dev, localhost:3000, 라우트 /",
+      "expected_output": "Full flow + Phase 3.5 responsive verification with agmo:frontend responsive mode",
+      "assertions": [],
+      "files": []
+    }
+  ]
+}

@@ -22,7 +22,7 @@ Before processing any request, determine its weight:
 
 When in doubt, invoke a skill. If there is even a 1% chance a skill applies, load it.
 
-## Skill Catalog (22 skills)
+## Skill Catalog (23 skills)
 
 Invoke via the `Skill` tool with `agmo:skillname`.
 
@@ -54,6 +54,11 @@ Invoke via the `Skill` tool with `agmo:skillname`.
 | `note-to-issue` | User wants to convert an Obsidian note to a GitHub Issue |
 | `wisdom` | User says "기억해", "이거 기록해" or a significant learning/decision occurred |
 
+### Figma
+| Skill | Invoke when... |
+|-------|---------------|
+| `implement-page` | figma.com/design URL + page implementation intent. '피그마 구현', '피그마 페이지', 'Figma implement' |
+
 ### Git
 | Skill | Invoke when... |
 |-------|---------------|
@@ -71,7 +76,7 @@ Invoke via the `Skill` tool with `agmo:skillname`.
 | `setup` | First-time plugin configuration |
 | `plugin-review` | User says "플러그인 리뷰", "plugin review" |
 
-## Agents (6)
+## Agents (7)
 
 Dispatch agents via the `Agent` tool with `subagent_type` parameter.
 
@@ -85,10 +90,11 @@ Dispatch agents via the `Agent` tool with `subagent_type` parameter.
 | `agmo:architect` | Analyze, verify, debug | **opus (고정)** | Verification, debugging, impact analysis |
 | `agmo:planner` | Create plans and strategies | **opus (고정)** | Plan creation, brainstorming |
 | `agmo:critic` | Review and critique | **opus (고정)** | Plan review, code review |
+| `agmo:frontend` | Frontend quality gate — visual, accessibility, responsive | **opus (고정)** | Figma vs browser comparison, WCAG review, responsive verification |
 
 ## Category Routing
 
-**agmo:planner, agmo:architect, agmo:critic** are model-fixed to **opus**. Do NOT pass `model` parameter — they use their own.
+**agmo:planner, agmo:architect, agmo:critic, agmo:frontend** are model-fixed to **opus**. Do NOT pass `model` parameter — they use their own.
 
 **agmo:executor, agmo:explore, agmo:archivist** use category routing — pass `model` explicitly:
 
@@ -136,6 +142,9 @@ Agent(subagent_type="agmo:archivist", model="sonnet", prompt="...")   # note-to-
 Agent(subagent_type="agmo:planner", prompt="...")
 Agent(subagent_type="agmo:architect", prompt="...")
 Agent(subagent_type="agmo:critic", prompt="...")
+
+# agmo:frontend — model-fixed to opus, do NOT pass model
+Agent(subagent_type="agmo:frontend", prompt="...")
 ```
 
 ## Workflow Chains
