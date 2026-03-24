@@ -7,8 +7,8 @@
   "plugins": [
     {
       "name": "agmo",
-      "description": "Optimized Claude Code plugin with 7 core agents, 23 demand-loaded skills, Obsidian-centered workflow",
-      "version": "0.4.0",
+      "description": "Optimized Claude Code plugin with 8 core agents, 25 demand-loaded skills, Obsidian-centered workflow",
+      "version": "0.5.0",
       "source": "./",
       "author": {
         "name": "Sungmin Cho"

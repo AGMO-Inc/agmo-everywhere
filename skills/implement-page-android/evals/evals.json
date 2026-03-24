@@ -1,0 +1,29 @@
+{
+  "skill_name": "implement-page-android",
+  "evals": [
+    {
+      "id": 1,
+      "name": "android-home-full-flow",
+      "prompt": "이 피그마 디자인을 안드로이드로 구현해줘. URL: https://www.figma.com/design/abc123/MyApp?node-id=0-1 프로젝트 경로: /Users/dev/MyAndroidApp 모듈: app",
+      "expected_output": "Phase 1에서 프레임을 발견하고, Phase 2에서 각 프레임을 Jetpack Compose로 구현하며, Phase 3에서 최종 검증을 수행한다.",
+      "assertions": [],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "minimal-input-settings",
+      "prompt": "안드로이드 피그마 구현해줘 https://www.figma.com/design/xyz789/Settings?node-id=1-1",
+      "expected_output": "프로젝트 경로와 모듈명 등 누락된 정보를 사용자에게 먼저 질문한다.",
+      "assertions": [],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "responsive-request",
+      "prompt": "이 피그마를 안드로이드 Compose로 구현하고 태블릿 대응도 확인해줘. URL: https://www.figma.com/design/def456/Dashboard?node-id=2-1 프로젝트: /Users/dev/TabletApp",
+      "expected_output": "Phase 3에서 responsive 모드를 사용하여 Compact(360dp), Medium(600dp), Expanded(840dp) 3단계로 검증한다.",
+      "assertions": [],
+      "files": []
+    }
+  ]
+}
