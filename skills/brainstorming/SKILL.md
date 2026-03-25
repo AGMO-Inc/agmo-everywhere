@@ -49,7 +49,7 @@ State your recommendation and why.
 
 ### 4. Present Design
 
-After the user picks an approach, present the design in sections. After each section, ask "여기까지 괜찮아?":
+After the user picks an approach, present the design in sections. After each section, ask "여기까지 괜찮을까요?":
 
 - **Architecture** — components and their relationships
 - **Data flow** — how data moves through the system
@@ -74,7 +74,7 @@ Once the user approves the design:
 2. **Complexity re-check** — determine the next step:
    - **Light** (all changes are mechanical — renaming, config edits, pattern replication with no judgment calls) → skip plan, delegate to executor agent (sonnet) directly for implementation. Do NOT invoke execute skill.
    - **Heavy** (any change requires design judgment — new logic, API design, error handling strategy, data model decisions) → invoke `agmo:plan` with the vault path: `Skill(skill="agmo:plan", args="--design-path {VAULT_PATH}")`
-3. If Heavy, ask: "구현 계획으로 넘어갈까?"
+3. If Heavy, ask: "구현 계획으로 넘어갈까요?"
 
 ## Principles
 
