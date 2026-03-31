@@ -52,6 +52,34 @@ Dispatch `architect` agent to perform verification:
 - Check linting / type checking
 - Verify acceptance criteria from the TODO
 
+## Codex Cross-Verification (Optional)
+
+> Requires **codex-plugin-cc** installed. Check `hud.json` → `codex` field. If `false`, skip this section entirely and use the architect's verdict as final.
+
+After the architect agent completes verification with a PASS verdict, invoke `/codex:review` (codex-plugin-cc slash command) for an independent code quality review from a different model. If the architect verdict is FAIL, skip Codex entirely — there is no value in a second opinion when the primary check already failed.
+
+### Verdict Merge Table
+
+Codex verdict is interpreted as ALLOW (no issues found) or BLOCK (issues found that should prevent merge).
+
+| Architect Verdict | Codex Verdict | Final Verdict |
+|-------------------|---------------|---------------|
+| PASS | ALLOW | **PASS** |
+| PASS | BLOCK | **FAIL** — include Codex feedback in retry context |
+| FAIL | (any) | **FAIL** — Architect verdict takes precedence |
+| PASS | Skip (unavailable) | **PASS** — proceed with Architect verdict only |
+
+### Codex Fallback Rules
+
+- **Auth failure (401/403)**: Disable Codex for the entire session. All subsequent gates skip Codex.
+- **Rate limit (429)**: Skip this gate only. Retry at next verification gate.
+- **Timeout**: Skip. Use Architect verdict only.
+- **Partial response (JSON unparseable)**: Treat as timeout — skip. A valid Codex verdict must be a complete, parseable JSON response.
+
+### Key Constraint
+
+Codex can only raise the quality bar, never lower it. If Architect says FAIL, the final verdict is always FAIL regardless of Codex opinion.
+
 ## Output Format
 
 ```

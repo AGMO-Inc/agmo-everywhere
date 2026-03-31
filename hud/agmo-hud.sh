@@ -78,6 +78,10 @@ C_YELLOW=$'\x1b[33m'
 C_RED=$'\x1b[31m'
 C_DIM=$'\x1b[2m'
 C_RESET=$'\x1b[0m'
+C_CYAN=$'\x1b[36m'
+C_BLUE=$'\x1b[34m'
+C_MAGENTA=$'\x1b[35m'
+C_BOLD_GREEN=$'\x1b[1;32m'
 
 color_by_pct() {
   local pct=$1
@@ -136,7 +140,7 @@ try:
 except Exception: pass
 " 2>/dev/null || echo "")
 
-# --- Read plugin version from hud.json ---
+# --- Read plugin version & codex status from hud.json ---
 PLUGIN_VERSION_PREFIX=""
 if [ -f "${STATE_DIR}/hud.json" ]; then
   _PV=$(STATE_DIR="$STATE_DIR" python3 -c "
@@ -147,8 +151,15 @@ try:
   print(v if v else '')
 except Exception: print('')
 " 2>/dev/null || echo "")
+  _CODEX=$(STATE_DIR="$STATE_DIR" python3 -c "
+import json, os
+try:
+  d = json.load(open(os.path.join(os.environ['STATE_DIR'], 'hud.json')))
+  print('true' if d.get('codex') else 'false')
+except Exception: print('false')
+" 2>/dev/null || echo "false")
   if [ -n "$_PV" ]; then
-    PLUGIN_VERSION_PREFIX="[agmo:${_PV}] "
+    PLUGIN_VERSION_PREFIX="${C_CYAN}[agmo:${_PV}]${C_RESET} "
   fi
 fi
 
@@ -165,12 +176,12 @@ fi
 
 CTX="${CTX:-0}"
 CTX_COLOR=$(color_by_pct "$CTX")
-LINE1="${LINE1} | 📐 ctx:${CTX_COLOR}${CTX}%${C_RESET}"
+LINE1="${LINE1}  📐 ctx:${CTX_COLOR}${CTX}%${C_RESET}"
 
-# Line 2: 📂 project(branch) | [active_skill] ▸ agents
-PROJECT_LABEL="📂 ${PROJECT}"
+# Line 2: 📂 project(branch)  [active_skill] ▸ agents
+PROJECT_LABEL="${C_BLUE}📂 ${PROJECT}${C_RESET}"
 if [ -n "$BRANCH" ]; then
-  PROJECT_LABEL="📂 ${PROJECT}(${BRANCH})"
+  PROJECT_LABEL="${C_BLUE}📂 ${PROJECT}(${BRANCH})${C_RESET}"
 fi
 
 # Read model and effort from stdin JSON and settings
@@ -192,21 +203,28 @@ except Exception: print('')
 " 2>/dev/null || echo "")
 
 if [ -n "$ACTIVE_SKILL_NAME" ]; then
-  LINE2="${PROJECT_LABEL} | [${ACTIVE_SKILL_NAME}] ▸ ${ACTIVE_AGENTS}"
+  LINE2="${PROJECT_LABEL}  [${C_MAGENTA}${ACTIVE_SKILL_NAME}${C_RESET}]  ${C_YELLOW}▸ ${ACTIVE_AGENTS}${C_RESET}"
 else
-  ORCH_LABEL="Agriman"
+  ORCH_LABEL="${C_MAGENTA}Agriman${C_RESET}"
   if [ -n "$MODEL_NAME" ] && [ -n "$EFFORT" ]; then
-    ORCH_LABEL="Agriman:${MODEL_NAME}(${EFFORT})"
+    ORCH_LABEL="${C_MAGENTA}Agriman:${MODEL_NAME}(${EFFORT})${C_RESET}"
   elif [ -n "$MODEL_NAME" ]; then
-    ORCH_LABEL="Agriman:${MODEL_NAME}"
+    ORCH_LABEL="${C_MAGENTA}Agriman:${MODEL_NAME}${C_RESET}"
   elif [ -n "$EFFORT" ]; then
-    ORCH_LABEL="Agriman:(${EFFORT})"
+    ORCH_LABEL="${C_MAGENTA}Agriman:(${EFFORT})${C_RESET}"
   fi
   if [ "$ACTIVE_AGENTS" != "-" ] && [ -n "$ACTIVE_AGENTS" ]; then
-    LINE2="${PROJECT_LABEL} | ${ORCH_LABEL} ▸ ${ACTIVE_AGENTS}"
+    LINE2="${PROJECT_LABEL}  ${ORCH_LABEL}  ${C_YELLOW}▸ ${ACTIVE_AGENTS}${C_RESET}"
   else
-    LINE2="${PROJECT_LABEL} | ${ORCH_LABEL}"
+    LINE2="${PROJECT_LABEL}  ${ORCH_LABEL}"
   fi
+fi
+
+# Append codex status to Line 1
+if [ "$_CODEX" = "true" ]; then
+  LINE1="${LINE1}  ${C_BOLD_GREEN}codex:on${C_RESET}"
+else
+  LINE1="${LINE1}  ${C_DIM}codex:off${C_RESET}"
 fi
 
 echo "${LINE1}"

@@ -28,6 +28,27 @@ Output structured findings (CRITICAL / IMPORTANT / MINOR), then judge:
 - **APPROVE** if zero CRITICAL findings remain — IMPORTANT and MINOR findings may still exist but do not block approval. Note them as recommendations in the approval.
 - **REQUEST_CHANGES** if any CRITICAL finding exists.
 
+### Phase 1.5: Codex Adversarial Review (Optional)
+
+> Requires **codex-plugin-cc** installed. Check `hud.json` → `codex` field. If `false`, skip this phase entirely and proceed to Phase 2.
+
+If Phase 1 result is REQUEST_CHANGES, skip Phase 1.5 entirely — Codex adversarial review only runs after critic APPROVE.
+
+After Phase 1 critic outputs APPROVE, invoke `/codex:adversarial-review` (codex-plugin-cc slash command) to get a second opinion from a different model. This combats self-review bias by having GPT challenge the plan that Claude created.
+
+**Codex adversarial review focuses on:**
+- Practical pitfalls the critic may have missed
+- Alternative architectures worth considering
+- Hidden assumptions in the plan
+- Real-world failure modes
+
+**Handling Codex results:**
+- **Codex returns no issues** → proceed to Phase 2 normally
+- **Codex returns BLOCK with findings** → add findings as IMPORTANT-level items in a separate "Codex Adversarial Review" section within Phase 2 User Feedback. The user decides whether to accept or dismiss each finding.
+- **Codex unavailable/timeout/error** → skip silently, proceed to Phase 2 with critic findings only
+
+**Key constraint:** Codex findings NEVER override the critic's APPROVE judgment. They are additional perspective only. The user has final say on whether to act on Codex feedback.
+
 ### Phase 2: User Feedback
 
 If the critic has findings, present them to the user. Ask if they agree with the critique.

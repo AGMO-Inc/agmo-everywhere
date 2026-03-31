@@ -183,3 +183,7 @@ User has a clear, scoped request with an existing plan
 3. **YAGNI.** Only do what is explicitly requested.
 4. **Token efficiency.** planner/architect/critic은 항상 opus. executor/explore/archivist는 카테고리 라우팅 (haiku/sonnet/opus).
 5. **Obsidian is the hub.** Plans, implementations, notes, and wisdom go to the vault.
+
+## Codex Integration
+
+codex-plugin-cc가 설치된 환경에서 Codex를 독립 검증자로 사용할 수 있다. 상세 가이드는 `references/codex-integration.md` 참조.

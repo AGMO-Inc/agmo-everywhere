@@ -16,7 +16,7 @@ mkdir -p "$(dirname "$STATE_FILE")"
 
 # Initialize state file if missing
 if [ ! -f "$STATE_FILE" ]; then
-  echo '{"skill":"","category":"","agents":[],"ctx_pct":"","active_skill":null,"plugin_version":""}' > "$STATE_FILE"
+  echo '{"skill":"","category":"","agents":[],"ctx_pct":"","active_skill":null,"plugin_version":"","codex":false}' > "$STATE_FILE"
 fi
 
 ACTION="${1:-}"
@@ -74,7 +74,7 @@ with open(os.environ['STATE_FILE'],'w') as f:
 " 2>/dev/null
     ;;
   clear)
-    echo '{"skill":"","category":"","agents":[],"ctx_pct":"","active_skill":null,"plugin_version":""}' > "$STATE_FILE"
+    echo '{"skill":"","category":"","agents":[],"ctx_pct":"","active_skill":null,"plugin_version":"","codex":false}' > "$STATE_FILE"
     ;;
   *)
     echo "Usage: update-hud.sh {skill|agent-add|agent-clear|ctx|clear} [args...]" >&2
