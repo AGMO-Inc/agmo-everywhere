@@ -71,6 +71,26 @@ with open(path, 'w') as f:
   fi
 fi
 
+# Detect Codex CLI (codex-plugin-cc)
+CODEX_AVAILABLE="false"
+if command -v codex &>/dev/null; then
+  CODEX_AVAILABLE="true"
+fi
+
+# Write codex availability to hud.json
+HUD_JSON="${SESSION_STATE_DIR}/hud.json"
+if [ -f "$HUD_JSON" ]; then
+  CODEX_AVAILABLE="$CODEX_AVAILABLE" HUD_JSON="$HUD_JSON" python3 -c "
+import json, os
+path = os.environ['HUD_JSON']
+with open(path, 'r') as f:
+    d = json.load(f)
+d['codex'] = os.environ['CODEX_AVAILABLE'] == 'true'
+with open(path, 'w') as f:
+    json.dump(d, f)
+" 2>/dev/null || true
+fi
+
 # Read using-plugin skill content directly
 SKILL_FILE="${PLUGIN_ROOT}/skills/using-plugin/SKILL.md"
 SKILL_CONTENT=""
@@ -136,6 +156,10 @@ fi
 
 if [ -n "$vault_warning" ]; then
   context="${context}"$'\n'"${vault_warning}"
+fi
+
+if [ "$CODEX_AVAILABLE" = "true" ]; then
+  context="${context}"$'\n'"Codex CLI detected. codex-plugin-cc slash commands available: /codex:adversarial-review, /codex:review, /codex:rescue"
 fi
 
 # Escape for JSON

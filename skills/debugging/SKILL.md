@@ -50,6 +50,23 @@ If 3 fixes have failed:
 3. Present findings to user
 4. Revise approach before attempting more fixes
 
+#### Codex Rescue (Optional)
+
+> Requires **codex-plugin-cc** installed. Check `hud.json` → `codex` field. If `false`, skip Codex rescue and proceed with architect's analysis only.
+
+After the architect completes the architecture review, invoke `/codex:rescue` (codex-plugin-cc slash command) to get a fresh perspective from a different model. Pass the architect's analysis as context so Codex can build on it rather than starting from scratch.
+
+**Sequential execution order:**
+1. Architect architecture review (existing Phase 4.5 behavior)
+2. `/codex:rescue` with architect's findings as input context
+
+**Handling Codex rescue results:**
+- Codex rescue output is **advisory only** — treat as "reference opinion"
+- The architect makes the final decision on which suggestions to apply
+- If Codex is unavailable/timeout/error → proceed with architect's analysis only, no error raised
+
+**Rationale:** When the same model fails 3 times on the same issue, a different model's perspective can identify blind spots that repeated attempts with the same model cannot.
+
 ### Phase 5: Verify
 
 After the fix, run verification. The fix is not done until verification passes.
