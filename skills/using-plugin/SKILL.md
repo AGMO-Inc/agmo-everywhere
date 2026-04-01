@@ -22,7 +22,7 @@ Before processing any request, determine its weight:
 
 When in doubt, invoke a skill. If there is even a 1% chance a skill applies, load it.
 
-## Skill Catalog (26 skills)
+## Skill Catalog (28 skills)
 
 Invoke via the `Skill` tool with `agmo:skillname`.
 
@@ -43,6 +43,7 @@ Invoke via the `Skill` tool with `agmo:skillname`.
 | `code-review` | User requests code review or review is needed at completion |
 | `debugging` | Systematic debugging needed, or verification failed 3 times |
 | `accessibility` | Auto-triggered by execute when TODO has frontend/ui tags. WCAG static review |
+| `guard` | PreToolUse 훅 기반 안전 가드레일 (스킬 아님, 훅). 위험 명령(rm -rf, DROP TABLE, force push) 자동 차단 |
 
 ### Obsidian
 | Skill | Invoke when... |
@@ -77,6 +78,13 @@ Invoke via the `Skill` tool with `agmo:skillname`.
 |-------|---------------|
 | `setup` | First-time plugin configuration |
 | `plugin-review` | User says "플러그인 리뷰", "plugin review" |
+
+### Analysis
+| Skill | Invoke when... |
+|-------|---------------|
+| `retro` | User wants weekly retrospective based on git history. "회고", "retro", "이번 주 정리" |
+| `security-audit` | User wants security review of the codebase. "보안 점검", "security audit" |
+| `benchmark` | User wants performance benchmarking. "벤치마크", "benchmark", "성능 측정" |
 
 ## Agents (8)
 

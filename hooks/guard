@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# PreToolUse hook: block dangerous Bash commands before execution.
+# Only intercepts Bash tool calls; all other tools pass through.
+set -euo pipefail
+
+python3 -c "
+import json, sys, re
+
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    sys.exit(0)
+
+tool = d.get('tool_name', '') or d.get('toolName', '')
+
+# Only guard Bash tool calls
+if tool != 'Bash':
+    sys.exit(0)
+
+cmd = d.get('tool_input', {}).get('command', '')
+
+# Normalize multiple spaces to single space for bypass detection
+normalized = re.sub(r'\s+', ' ', cmd).strip()
+
+def block(reason):
+    print(json.dumps({'decision': 'block', 'reason': reason}))
+    sys.exit(0)
+
+# 1. rm -rf / or rm -rf ~ (root/home wipe)
+#    Matches: rm -rf /, rm  -rf /, rm -rf~, variants with --no-preserve-root
+if re.search(r'\brm\s+-[^\s]*r[^\s]*f\s+[/~]|\brm\s+-[^\s]*f[^\s]*r\s+[/~]', normalized):
+    block('Blocked: rm -rf on / or ~ is not allowed')
+
+# 2. DROP TABLE / DROP DATABASE (SQL destructive DDL)
+if re.search(r'\bDROP\s+(TABLE|DATABASE)\b', normalized, re.IGNORECASE):
+    block('Blocked: DROP TABLE / DROP DATABASE is not allowed')
+
+# 3. git push --force to main or master
+#    Matches: git push --force origin main, git push origin main --force, git push -f ...
+if re.search(r'\bgit\s+push\b', normalized):
+    has_force = bool(re.search(r'(--force|-f)\b', normalized))
+    targets_main = bool(re.search(r'\b(main|master)\b', normalized))
+    if has_force and targets_main:
+        block('Blocked: git push --force to main/master is not allowed')
+
+# 4. git reset --hard on main or master branch context
+#    Matches: git reset --hard (when main/master appears in same command)
+if re.search(r'\bgit\s+reset\s+--hard\b', normalized):
+    if re.search(r'\b(main|master)\b', normalized):
+        block('Blocked: git reset --hard targeting main/master is not allowed')
+
+sys.exit(0)
+" 2>/dev/null
+
+exit 0

@@ -9,11 +9,25 @@ description: Use for systematic debugging. Auto-triggered when verification fail
 
 If a fix has been attempted **3 times without success**, do NOT try a 4th fix. Instead, escalate to Phase 4.5 (architecture review).
 
+## Scope Lock
+
+Before starting any phase, lock the original issue scope:
+- Write down the **exact symptom** being debugged in one sentence
+- If an unrelated problem is discovered during investigation, log it separately and do NOT pivot — return to the original issue
+- Scope creep is the #1 cause of debugging sessions that never resolve
+
 ## Process
 
 ### Phase 1: Reproduce
 
 Confirm the failure is reproducible. Run the failing command/test and capture the exact error.
+
+### Prior Learnings
+
+Before isolating, search for related prior knowledge:
+- Use `scripts/vault-read.sh` to directly read vault wisdom files (`learnings.md`, `issues.md`)
+- Or invoke `agmo:vault-search` skill with relevant keywords (e.g., error message, module name, symptom)
+- If a prior learning matches the current issue, apply it before proceeding to avoid repeat investigation
 
 ### Phase 2: Isolate
 
@@ -34,6 +48,18 @@ Delegate to `explore` agent (standard) to search for related code.
 5. **Identify the root** — the actual cause, not a symptom
 
 Delegate to `architect` agent for analysis.
+
+### Pattern Analysis
+
+Classify the error type before attempting a fix:
+
+| Type | Description | Data to Collect |
+|------|-------------|-----------------|
+| syntax | Invalid code structure caught at parse/compile time | File, line number, exact parse error message |
+| runtime | Valid code that fails during execution | Stack trace, input values, execution context |
+| logic | Code runs but produces wrong output | Expected vs actual values, affected code path |
+| config | Wrong or missing configuration values | Config file path, key, expected vs actual value |
+| dependency | External package or service mismatch | Package name, version, error from dependency |
 
 ### Phase 4: Fix
 
@@ -85,6 +111,12 @@ Error context:
 ### Phase 5: Verify
 
 After the fix, run verification. The fix is not done until verification passes.
+
+### Learnings Capture
+
+After Phase 5 verification passes, automatically record the resolved issue:
+- Invoke `agmo:wisdom` with the issue summary, root cause, and fix applied
+- This ensures future debugging sessions can benefit from prior knowledge lookup
 
 ## Defense in Depth
 
