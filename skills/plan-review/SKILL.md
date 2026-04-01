@@ -34,16 +34,31 @@ Output structured findings (CRITICAL / IMPORTANT / MINOR), then judge:
 
 If Phase 1 result is REQUEST_CHANGES, skip Phase 1.5 entirely — Codex adversarial review only runs after critic APPROVE.
 
-After Phase 1 critic outputs APPROVE, invoke `/codex:adversarial-review` (codex-plugin-cc slash command) to get a second opinion from a different model. This combats self-review bias by having GPT challenge the plan that Claude created.
+After Phase 1 critic outputs APPROVE, dispatch `codex:codex-rescue` agent to get a second opinion from a different model. This combats self-review bias by having GPT challenge the plan that Claude created.
 
-**Codex adversarial review focuses on:**
-- Practical pitfalls the critic may have missed
+**How to dispatch:**
+
+```
+Agent(subagent_type="codex:codex-rescue", prompt="""
+You are reviewing a plan document as an adversarial reviewer.
+Your job is to challenge the plan, find pitfalls, and identify hidden assumptions.
+
+Focus on:
+- Practical pitfalls the reviewer may have missed
 - Alternative architectures worth considering
 - Hidden assumptions in the plan
 - Real-world failure modes
 
+Plan content:
+{plan_content}
+
+Return your findings as structured JSON:
+{ "verdict": "ALLOW" | "BLOCK", "findings": [...] }
+""")
+```
+
 **Handling Codex results:**
-- **Codex returns no issues** → proceed to Phase 2 normally
+- **Codex returns ALLOW (no issues)** → proceed to Phase 2 normally
 - **Codex returns BLOCK with findings** → add findings as IMPORTANT-level items in a separate "Codex Adversarial Review" section within Phase 2 User Feedback. The user decides whether to accept or dismiss each finding.
 - **Codex unavailable/timeout/error** → skip silently, proceed to Phase 2 with critic findings only
 

@@ -54,11 +54,26 @@ If 3 fixes have failed:
 
 > Requires **codex-plugin-cc** installed. Check `hud.json` → `codex` field. If `false`, skip Codex rescue and proceed with architect's analysis only.
 
-After the architect completes the architecture review, invoke `/codex:rescue` (codex-plugin-cc slash command) to get a fresh perspective from a different model. Pass the architect's analysis as context so Codex can build on it rather than starting from scratch.
+After the architect completes the architecture review, dispatch `codex:codex-rescue` agent to get a fresh perspective from a different model. Pass the architect's analysis as context so Codex can build on it rather than starting from scratch.
+
+**How to dispatch:**
+
+```
+Agent(subagent_type="codex:codex-rescue", prompt="""
+A debugging effort has failed 3 times. The architect has reviewed the architecture.
+Provide a fresh perspective on the root cause and suggest alternative fix approaches.
+
+Architect's analysis:
+{architect_analysis}
+
+Error context:
+{error_details_and_prior_attempts}
+""")
+```
 
 **Sequential execution order:**
 1. Architect architecture review (existing Phase 4.5 behavior)
-2. `/codex:rescue` with architect's findings as input context
+2. `codex:codex-rescue` agent dispatch with architect's findings as input context
 
 **Handling Codex rescue results:**
 - Codex rescue output is **advisory only** — treat as "reference opinion"

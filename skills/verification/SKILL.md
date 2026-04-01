@@ -56,7 +56,22 @@ Dispatch `architect` agent to perform verification:
 
 > Requires **codex-plugin-cc** installed. Check `hud.json` → `codex` field. If `false`, skip this section entirely and use the architect's verdict as final.
 
-After the architect agent completes verification with a PASS verdict, invoke `/codex:review` (codex-plugin-cc slash command) for an independent code quality review from a different model. If the architect verdict is FAIL, skip Codex entirely — there is no value in a second opinion when the primary check already failed.
+After the architect agent completes verification with a PASS verdict, dispatch `codex:codex-rescue` agent for an independent code quality review from a different model. If the architect verdict is FAIL, skip Codex entirely — there is no value in a second opinion when the primary check already failed.
+
+**How to dispatch:**
+
+```
+Agent(subagent_type="codex:codex-rescue", prompt="""
+You are performing an independent code quality review.
+Review the following code changes for bugs, security issues, performance problems, and design flaws.
+
+Code context:
+{code_diff_or_changed_files_summary}
+
+Return your findings as structured JSON:
+{ "verdict": "ALLOW" | "BLOCK", "findings": [...] }
+""")
+```
 
 ### Verdict Merge Table
 

@@ -11,18 +11,75 @@
 ## Detection
 
 At session start, `hooks/session-start` checks `command -v codex` and writes the result to `hud.json`:
-- `"codex": true` → Codex slash commands available
+- `"codex": true` → `codex:codex-rescue` agent available
 - `"codex": false` → All Codex gates skipped silently
 
-All skills that use Codex MUST check `hud.json` → `codex` field before invoking any `/codex:*` command.
+All skills that use Codex MUST check `hud.json` → `codex` field before dispatching the agent.
 
 ## Gate Integration Points
 
-| Gate | Skill | Codex Command | Role |
-|------|-------|---------------|------|
-| Plan Review | `plan-review` Phase 1.5 | `/codex:adversarial-review` | Challenge plan design from a different model's perspective |
-| Verification | `verification` Codex Cross-Verification | `/codex:review` | Independent code quality review after architect PASS |
-| Debugging | `debugging` Phase 4.5 | `/codex:rescue` | Fresh debugging perspective after 3 fix failures |
+All three gates use the same agent type (`codex:codex-rescue`) with different prompts to differentiate roles.
+
+| Gate | Skill | Dispatch | Role |
+|------|-------|----------|------|
+| Plan Review | `plan-review` Phase 1.5 | `Agent(subagent_type="codex:codex-rescue")` | Challenge plan design from a different model's perspective |
+| Verification | `verification` Codex Cross-Verification | `Agent(subagent_type="codex:codex-rescue")` | Independent code quality review after architect PASS |
+| Debugging | `debugging` Phase 4.5 | `Agent(subagent_type="codex:codex-rescue")` | Fresh debugging perspective after 3 fix failures |
+
+## Prompt Patterns
+
+Each gate injects different context into the `codex:codex-rescue` agent prompt:
+
+### Plan Review (Adversarial)
+
+```
+Agent(subagent_type="codex:codex-rescue", prompt="""
+You are reviewing a plan document as an adversarial reviewer.
+Your job is to challenge the plan, find pitfalls, and identify hidden assumptions.
+
+Focus on:
+- Practical pitfalls the reviewer may have missed
+- Alternative architectures worth considering
+- Hidden assumptions in the plan
+- Real-world failure modes
+
+Plan content:
+{plan_content}
+
+Return your findings as structured JSON:
+{ "verdict": "ALLOW" | "BLOCK", "findings": [...] }
+""")
+```
+
+### Verification (Code Review)
+
+```
+Agent(subagent_type="codex:codex-rescue", prompt="""
+You are performing an independent code quality review.
+Review the following code changes for bugs, security issues, performance problems, and design flaws.
+
+Code context:
+{code_diff_or_changed_files_summary}
+
+Return your findings as structured JSON:
+{ "verdict": "ALLOW" | "BLOCK", "findings": [...] }
+""")
+```
+
+### Debugging (Rescue)
+
+```
+Agent(subagent_type="codex:codex-rescue", prompt="""
+A debugging effort has failed 3 times. The architect has reviewed the architecture.
+Provide a fresh perspective on the root cause and suggest alternative fix approaches.
+
+Architect's analysis:
+{architect_analysis}
+
+Error context:
+{error_details_and_prior_attempts}
+""")
+```
 
 ## Verdict Merge Logic
 
