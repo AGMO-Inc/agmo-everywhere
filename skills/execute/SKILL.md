@@ -69,6 +69,59 @@ For each TODO (respecting dependency order):
      → Mark TODO complete, proceed to next
 ```
 
+### Completion Status
+
+When a TODO is marked complete (after step 3 PASS and step 4 post-processing), report one of the following statuses:
+
+| Status | When to use |
+|--------|-------------|
+| `DONE` | All acceptance criteria met, no known issues |
+| `DONE_WITH_CONCERNS` | Functionally complete but has known limitations or warnings |
+| `BLOCKED` | Cannot proceed due to missing dependency or external blocker |
+| `NEEDS_CONTEXT` | Requires clarification or additional context from the user |
+
+**Output format per TODO:**
+
+```
+Status: DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
+Evidence: [Brief summary of how completion was verified]
+```
+
+For `DONE_WITH_CONCERNS`, also include:
+```
+Concerns:
+  - [Concern description]
+Follow-up: [Recommended next steps]
+```
+
+For `BLOCKED`, also include:
+```
+Reason: [Why it is blocked]
+Blocker: [What needs to be resolved]
+Next-Steps: [What must happen to unblock]
+```
+
+For `NEEDS_CONTEXT`, also include:
+```
+Question: [What clarification is needed]
+Options: [Possible approaches, if applicable]
+```
+
+**Behavior by status:**
+
+- **DONE**: Proceed to the next TODO immediately.
+- **DONE_WITH_CONCERNS**: Log the concerns, report to the user, then proceed to the next TODO. Do not halt execution.
+- **BLOCKED**: Report the blocker to the user and wait. Do not auto-proceed to the next TODO.
+- **NEEDS_CONTEXT**: Ask the user the clarifying question and wait for their response. Do not auto-proceed.
+
+**Connection to verification:**
+
+- Verification PASS + no concerns → `DONE`
+- Verification PASS + known limitations or warnings → `DONE_WITH_CONCERNS`
+- Verification FAIL after 3 retries → debugging invoked; status resolved after debugging resolves
+- Dependency missing or external blocker encountered → `BLOCKED`
+- Acceptance criteria ambiguous before or during execution → `NEEDS_CONTEXT`
+
 ### 3. Parallel Execution
 
 If multiple TODOs are independent (no dependency, no shared files, and no import/export dependencies between their target files):

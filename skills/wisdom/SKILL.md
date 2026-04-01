@@ -67,6 +67,30 @@ Append to the appropriate file:
 - [YYYY-MM-DD] Entry content here — optional [[link to detailed note]]
 ```
 
+Optionally add metadata on the same line for traceability:
+```markdown
+- [YYYY-MM-DD] Entry content (confidence: high) (source: debugging) (ref: SecurityConfig.kt:42)
+```
+
+### Metadata Fields
+
+| Field | Values | When to Use |
+|-------|--------|-------------|
+| **confidence** | `high` \| `medium` \| `low` | `high`: Verified through testing/direct evidence. `medium`: Reasonable inference from code review or multiple observations. `low`: Unconfirmed hypothesis or educated guess. |
+| **source** | `debugging` \| `review` \| `user` \| `execute` | `debugging`: Root cause found during troubleshooting. `review`: Discovered during code review. `user`: User reported or requested. `execute`: Observed during implementation/verification. |
+| **ref** | `file.ext:line` | Reference to specific code location (file path and line number) that demonstrates or validates this wisdom. |
+
+**Note:** All metadata fields are optional. Include only what's relevant. Existing entries without metadata are valid and do not require retroactive updates.
+
+### Examples
+
+Good entries with metadata:
+```markdown
+- [2026-04-02] CORS must be configured in SecurityFilterChain, not WebMvcConfigurer (confidence: high) (source: debugging) (ref: SecurityConfig.kt:42)
+- [2026-04-01] Spring autowiring fails if bean methods lack @Bean annotation (confidence: high) (source: review)
+- [2026-03-30] React re-render issue might be caused by unstable object refs (confidence: low) (source: execute)
+```
+
 ## Choosing Project vs Shared
 
 | If the wisdom... | Store in... |
@@ -80,8 +104,12 @@ Append to the appropriate file:
 On user request ("wisdom 정리해줘" — user asks to clean up wisdom):
 1. Read all wisdom files
 2. Identify outdated, duplicate, or resolved entries
-3. Present candidates for removal
-4. Remove only with user approval
+3. Prioritize removal candidates:
+   - **High priority:** Entries with `confidence: low` (unverified hypotheses)
+   - **Medium priority:** Outdated or superseded entries
+   - **Low priority:** Duplicates that don't add new context
+4. Present candidates for removal (sorted by priority)
+5. Remove only with user approval
 
 ## Injection
 

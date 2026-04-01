@@ -19,6 +19,35 @@ Delegate to `executor` agent (quick/haiku category):
 
 ## Pull Request
 
+### Pre-PR Test Gate
+
+Before creating a PR, ensure the build and tests pass:
+
+1. **Auto-detect build/test commands** — check for:
+   - `package.json` scripts (`npm test`, `npm run build`)
+   - `Makefile` targets
+   - `gradle` or `maven` commands
+   - Other project-specific build tools
+2. **Run build and tests** — execute the detected commands in order
+3. **Handle missing tests**:
+   - If no build/test commands found, log a warning and skip (do not fail)
+4. **On failure**:
+   - Stop and report the failure details to the user
+   - Do not proceed with PR creation until tests pass
+5. **On success** — proceed to PR creation step
+
+### CHANGELOG Update
+
+If the PR contains user-facing changes (new features, bug fixes, breaking changes):
+
+1. **Check for CHANGELOG.md** — if the file exists in the project root:
+   - Add a checklist item: `- [ ] CHANGELOG.md updated`
+   - Include in PR body under "Test plan"
+2. **If CHANGELOG.md does not exist** — skip this step (no action required)
+3. **Format** — follow the project's existing CHANGELOG pattern (if present)
+
+### Create PR
+
 Delegate to `executor` agent (standard/sonnet category):
 
 1. **Check branch status** — is it pushed? up to date?
