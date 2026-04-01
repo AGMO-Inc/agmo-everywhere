@@ -79,7 +79,7 @@ C_RED=$'\x1b[31m'
 C_DIM=$'\x1b[2m'
 C_RESET=$'\x1b[0m'
 C_CYAN=$'\x1b[36m'
-C_BLUE=$'\x1b[34m'
+C_BLUE=$'\x1b[94m'
 C_MAGENTA=$'\x1b[35m'
 C_BOLD_GREEN=$'\x1b[1;32m'
 
