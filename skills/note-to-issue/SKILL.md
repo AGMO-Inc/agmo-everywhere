@@ -1,6 +1,6 @@
 ---
 name: note-to-issue
-description: Use to convert an Obsidian note into a GitHub Issue. Triggers on "노트로 이슈 만들어", "이슈로 변환", "깃허브 이슈", "이거 이슈로".
+description: Use to convert an Obsidian note into a GitHub Issue. Triggers on "노트로 이슈 만들어", "이슈로 변환", "이거 이슈로", "노트 이슈화". Only use when user explicitly references an Obsidian note as the source. For creating issues from conversation context (without a note), use create-issue instead.
 ---
 
 # Note to Issue — Obsidian Note to GitHub Issue

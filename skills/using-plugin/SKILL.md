@@ -22,7 +22,7 @@ Before processing any request, determine its weight:
 
 When in doubt, invoke a skill. If there is even a 1% chance a skill applies, load it.
 
-## Skill Catalog (25 skills)
+## Skill Catalog (26 skills)
 
 Invoke via the `Skill` tool with `agmo:skillname`.
 
@@ -63,6 +63,7 @@ Invoke via the `Skill` tool with `agmo:skillname`.
 ### Git
 | Skill | Invoke when... |
 |-------|---------------|
+| `create-issue` | Create GitHub Issue from conversation context. '이슈 만들어', '이슈 생성', 'create issue'. NOT for Obsidian note conversion (use note-to-issue) |
 | `git-workflow` | Commit, PR, branch operations needed |
 
 ### Orchestration
