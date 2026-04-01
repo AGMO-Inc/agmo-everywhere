@@ -169,9 +169,9 @@ LINE2=""
 
 # Line 1: ⏱ rate limits | 📐 ctx | 📂 project
 if [ -n "$RATE_5H_COLORED" ] && [ -n "$RATE_WK_COLORED" ]; then
-  LINE1="${PLUGIN_VERSION_PREFIX}⏱ 5h:${RATE_5H_COLORED} wk:${RATE_WK_COLORED}"
+  LINE1="${PLUGIN_VERSION_PREFIX}🔋 5h:${RATE_5H_COLORED} wk:${RATE_WK_COLORED}"
 else
-  LINE1="${PLUGIN_VERSION_PREFIX}⏱ ${C_DIM}-${C_RESET}"
+  LINE1="${PLUGIN_VERSION_PREFIX}🔋 ${C_DIM}-${C_RESET}"
 fi
 
 CTX="${CTX:-0}"
@@ -203,18 +203,18 @@ except Exception: print('')
 " 2>/dev/null || echo "")
 
 if [ -n "$ACTIVE_SKILL_NAME" ]; then
-  LINE2="${PROJECT_LABEL}  [${C_MAGENTA}${ACTIVE_SKILL_NAME}${C_RESET}]  ${C_YELLOW}▸ ${ACTIVE_AGENTS}${C_RESET}"
+  LINE2="${PROJECT_LABEL}  🎯 [${C_MAGENTA}${ACTIVE_SKILL_NAME}${C_RESET}]  ⚡ ${C_YELLOW}${ACTIVE_AGENTS}${C_RESET}"
 else
-  ORCH_LABEL="${C_MAGENTA}Agriman${C_RESET}"
+  ORCH_LABEL="🤖 ${C_MAGENTA}Agriman${C_RESET}"
   if [ -n "$MODEL_NAME" ] && [ -n "$EFFORT" ]; then
-    ORCH_LABEL="${C_MAGENTA}Agriman:${MODEL_NAME}(${EFFORT})${C_RESET}"
+    ORCH_LABEL="🤖 ${C_MAGENTA}Agriman:${MODEL_NAME}(${EFFORT})${C_RESET}"
   elif [ -n "$MODEL_NAME" ]; then
-    ORCH_LABEL="${C_MAGENTA}Agriman:${MODEL_NAME}${C_RESET}"
+    ORCH_LABEL="🤖 ${C_MAGENTA}Agriman:${MODEL_NAME}${C_RESET}"
   elif [ -n "$EFFORT" ]; then
-    ORCH_LABEL="${C_MAGENTA}Agriman:(${EFFORT})${C_RESET}"
+    ORCH_LABEL="🤖 ${C_MAGENTA}Agriman:(${EFFORT})${C_RESET}"
   fi
   if [ "$ACTIVE_AGENTS" != "-" ] && [ -n "$ACTIVE_AGENTS" ]; then
-    LINE2="${PROJECT_LABEL}  ${ORCH_LABEL}  ${C_YELLOW}▸ ${ACTIVE_AGENTS}${C_RESET}"
+    LINE2="${PROJECT_LABEL}  ${ORCH_LABEL}  ⚡ ${C_YELLOW}${ACTIVE_AGENTS}${C_RESET}"
   else
     LINE2="${PROJECT_LABEL}  ${ORCH_LABEL}"
   fi
