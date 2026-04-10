@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash hooks/guard"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/guard\""
           }
         ]
       },
