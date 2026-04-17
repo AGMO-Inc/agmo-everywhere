@@ -91,12 +91,11 @@ with open(path, 'w') as f:
 " 2>/dev/null || true
 fi
 
-# Read using-plugin skill content directly
-SKILL_FILE="${PLUGIN_ROOT}/skills/using-plugin/SKILL.md"
-SKILL_CONTENT=""
-if [ -f "$SKILL_FILE" ]; then
-  # Strip frontmatter (everything between first two ---)
-  SKILL_CONTENT=$(sed -n '/^---$/,/^---$/!p' "$SKILL_FILE")
+# Read orchestrator bootstrap content
+BOOTSTRAP_FILE="${PLUGIN_ROOT}/bootstrap/orchestrator.md"
+BOOTSTRAP_CONTENT=""
+if [ -f "$BOOTSTRAP_FILE" ]; then
+  BOOTSTRAP_CONTENT=$(cat "$BOOTSTRAP_FILE")
 fi
 
 # Detect project from cwd
@@ -142,7 +141,7 @@ if [[ -n "$VAULT_ROOT" && -d "$VAULT_ROOT" ]]; then
 fi
 
 # Build full context: skill content + wisdom
-context="${SKILL_CONTENT}"
+context="${BOOTSTRAP_CONTENT}"
 
 if [ -n "$wisdom_content" ]; then
   context="${context}"$'\n\n'"## Inherited Wisdom (${PROJECT_NAME})"$'\n\n'"${wisdom_content}"
