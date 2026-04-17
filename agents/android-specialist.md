@@ -1,7 +1,7 @@
 ---
 name: android-specialist
 description: "Android frontend quality gate agent with 3 verification modes: visual (Figma vs Compose Preview comparison), accessibility (Android WCAG review), responsive (multi-screen-size verification)."
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Grep, Glob, Bash
 ---
 

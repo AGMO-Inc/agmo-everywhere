@@ -6,7 +6,7 @@ description: |
   <example>Compare Figma screenshot against browser screenshot and return VERDICT/SCORE/ISSUES</example>
   <example>Run WCAG accessibility static review on changed frontend files</example>
   <example>Verify responsive layout across mobile/tablet/desktop breakpoints</example>
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Grep, Glob, Bash
 ---
 

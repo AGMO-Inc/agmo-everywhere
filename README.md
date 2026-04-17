@@ -4,7 +4,7 @@
 
 **Claude Code 플러그인 — 8개 에이전트, 28개 온디맨드 스킬, Obsidian 중심 워크플로우**
 
-[![Version](https://img.shields.io/badge/version-0.7.0-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.7.0)
+[![Version](https://img.shields.io/badge/version-0.7.1-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.7.1)
 [![Agents](https://img.shields.io/badge/agents-8-green.svg)](#에이전트-agents)
 [![Skills](https://img.shields.io/badge/skills-28-orange.svg)](#스킬-카탈로그-skills)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)

@@ -7,7 +7,7 @@ description: |
   <example>Debug why the API returns 500 on this endpoint</example>
   <example>Analyze the impact of changing the database schema</example>
   <example>Review whether the implementation matches the plan</example>
-model: claude-opus-4-6
+model: claude-opus-4-7
 tools: Read, Grep, Glob, Bash
 ---
 
