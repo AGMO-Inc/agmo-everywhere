@@ -3,6 +3,15 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.2] - 2026-05-29
+
+### Changed
+- 모델 고정 에이전트 5종(planner / architect / critic / frontend / android-specialist)의 기본 모델을 `claude-opus-4-7` → `claude-opus-4-8`로 업그레이드
+
+### Rationale
+- Opus 4.8이 출시되어 동일 카테고리 슬롯에서 추론/코드 품질 개선을 기대
+- executor / explore / archivist는 카테고리 라우팅(haiku·sonnet·opus) 그대로 유지 — 변경 없음
+
 ## [0.7.1] - 2026-04-17
 
 ### Changed
