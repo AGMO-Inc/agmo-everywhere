@@ -11,6 +11,7 @@ Delegate to `archivist` agent (haiku):
 
 1. **Search** — `scripts/vault-search.sh --query "{keyword}" [--project {PROJECT}] [--limit 10]`
    - If current project context is known, add `--project {PROJECT}`
+   - For session-start orientation, inspect bounded compiled context first with `scripts/wiki-context.sh --project {PROJECT} --budget 6000`; then use vault-search for detail pages on demand.
 2. **Parse results** — Parse the JSON array and display in numbered format:
    ```
    ### Search Results: "{keyword}" (N found)

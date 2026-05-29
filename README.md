@@ -76,7 +76,9 @@ claude plugin install agmo
 
 **프로젝트 간 컨텍스트 공유** — brainstorming이나 plan 스킬이 자동으로 vault를 탐색하여 관련 설계 문서, 과거 결정사항을 참조합니다. 프로젝트 A에서 내린 결정이 프로젝트 B 작업에도 반영됩니다.
 
-**Wisdom 축적** — `decisions.md`, `learnings.md`, `issues.md`가 매 세션 시작 시 자동 로드됩니다. 축적된 경험이 다음 세션에도 이어져, 시간이 지날수록 에이전트가 팀의 맥락을 더 잘 이해하게 됩니다.
+**Wisdom 축적** — `decisions.md`, `learnings.md`, `issues.md`는 짧은 교훈/결정/이슈의 원본입니다. 세션 시작 시에는 전체 파일을 무조건 주입하지 않고, llm-wiki context budgeter가 현재 프로젝트 기준으로 필요한 항목만 제한된 예산 안에서 선택합니다.
+
+**llm-wiki 컨텍스트 스파인** — `.agmo/llm-wiki/` 아래 `SCHEMA.md`, `INDEX.md`, `LOG.md`, `projects/<project>.md`를 유지합니다. Obsidian은 사람이 읽고 쓰는 vault이고, llm-wiki 스파인은 에이전트가 컨텍스트 윈도우를 아끼기 위해 먼저 읽는 압축 지도입니다. `wiki-maintain.sh`는 stale/low-confidence/contested/broken link 신호를 찾아 오염된 맥락을 그대로 믿지 않고 검증·대체·플래그 처리하게 돕습니다.
 
 **양방향 링크로 추적성 확보** — 설계 → 플랜 → 구현 간 wikilink가 자동 생성됩니다. Obsidian 그래프 뷰에서 문서 간 관계를 한눈에 파악할 수 있습니다.
 
