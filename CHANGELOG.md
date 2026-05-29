@@ -3,6 +3,23 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.0] - 2026-05-29
+
+### Added
+- llm-wiki project bootstrap workflow: `wiki-init.sh`, Obsidian-friendly project structure, schema/index/log templates, and setup skill integration
+- session-start llm-wiki context budgeter: source-prioritized, deduplicated, budgeted project/shared context injection via `wiki-context.sh`
+- wiki capture workflow: `wiki-capture.sh` for YAML-safe project/shared captures with confidence, supersession, and contested-context metadata
+- wiki maintenance workflow: `wiki-maintain.sh` for stale, low-confidence, contested, superseded, broken wikilink, and missing-frontmatter detection
+- regression tests for context budgeting, supersession filtering, and maintenance diagnostics
+
+### Changed
+- `session-start` now delegates llm-wiki context assembly to the reusable context script instead of ad-hoc shell logic
+- plugin usage, setup, wisdom, vault-search, CLI reference, and save-impl documentation now describe the llm-wiki context hygiene loop
+
+### Rationale
+- Give long-running Claude Code workflows a local project memory layer that can be searched, curated, superseded, and kept clean instead of relying only on conversational memory
+- Reduce stale-context contamination by making low-confidence/contested/superseded wiki entries visible and excluding superseded captures from startup context
+
 ## [0.7.2] - 2026-05-29
 
 ### Changed

@@ -130,7 +130,35 @@ Create empty wisdom files if they do not exist:
 
 ---
 
-### Step 6. Verify Plugin Installation
+### Step 6. Initialize llm-wiki Context Spine
+
+Initialize the agent-facing compiled context layer. This does **not** replace Obsidian notes or wisdom files; it creates a bounded context spine that `session-start` can read without dumping the whole vault.
+
+```bash
+PROJECT=$(basename "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")
+bash scripts/wiki-init.sh --project "$PROJECT"
+```
+
+Expected output:
+```
+INITIALIZED:<vault_root>/.agmo/llm-wiki
+# or, on rerun:
+EXISTS:<vault_root>/.agmo/llm-wiki
+```
+
+Created structure:
+```
+<vault_root>/.agmo/llm-wiki/
+  SCHEMA.md
+  INDEX.md
+  LOG.md
+  projects/<project>.md
+  projects/<project>/captures/
+```
+
+---
+
+### Step 7. Verify Plugin Installation
 
 ```bash
 claude plugin list
@@ -140,7 +168,7 @@ Confirm `agmo@agmo-local` (or the detected agmo plugin) is listed and enabled.
 
 ---
 
-### Step 7. Report
+### Step 8. Report
 
 ```
 ## Setup Complete
@@ -148,6 +176,7 @@ Confirm `agmo@agmo-local` (or the detected agmo plugin) is listed and enabled.
 - Config:        ~/.agmo/config (vault_root, initialized_at)
 - Vault:         <vault_root>
 - Shared wisdom: initialized
+- llm-wiki:      initialized at <vault_root>/.agmo/llm-wiki
 - statusLine:    ~/.claude/plugins/<agmo-plugin-dir>/hooks/statusLine.js → set in ~/.claude/settings.json
 - Plugin:        agmo@agmo-local enabled
 

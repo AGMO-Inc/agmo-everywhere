@@ -33,7 +33,7 @@ Each wisdom entry is **1-2 lines maximum**. If more context is needed, link to a
 
 Delegate to `archivist` agent (haiku).
 
-**CRITICAL: Wisdom entries are ALWAYS appended to existing category files (learnings.md, decisions.md, issues.md). NEVER create independent files like `[Wisdom] title.md`. The session-start hook only reads the 3 category files — independent files are never injected into sessions.**
+**CRITICAL: Wisdom entries are ALWAYS appended to existing category files (learnings.md, decisions.md, issues.md). NEVER create independent files like `[Wisdom] title.md`. Wisdom files remain the source-of-truth for short lessons, but session-start now reads them through the llm-wiki context budgeter instead of dumping full files directly.**
 
 ### Project-specific wisdom
 ```
@@ -114,3 +114,5 @@ On user request ("wisdom 정리해줘" — user asks to clean up wisdom):
 ## Injection
 
 Wisdom injection is handled by the `session-start` hook, NOT by this skill. This skill only handles recording and pruning.
+
+`session-start` calls `scripts/wiki-context.sh`, which prioritizes `.agmo/llm-wiki` project capsules/captures and then includes selected wisdom within `AGMO_CONTEXT_BUDGET_CHARS` (default 6000). Keep wisdom entries short so they survive budget pressure. If a learning needs more context, capture the detail with `scripts/wiki-capture.sh` and link to it from the wisdom line.

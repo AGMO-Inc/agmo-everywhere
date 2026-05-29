@@ -191,7 +191,8 @@ User has a clear, scoped request with an existing plan
 2. **Evidence before claims.** Never say "done" without verification evidence.
 3. **YAGNI.** Only do what is explicitly requested.
 4. **Token efficiency.** planner/architect/critic은 항상 opus. executor/explore/archivist는 카테고리 라우팅 (haiku/sonnet/opus).
-5. **Obsidian is the hub.** Plans, implementations, notes, and wisdom go to the vault.
+5. **Obsidian is the hub; llm-wiki is the startup map.** Treat `AGMO_VAULT_ROOT` as the knowledge base root. At session start, read the injected `## LLM Wiki Context` as the first orientation layer. Before any non-trivial brainstorming, planning, implementation, review, or debugging task, assume relevant context may already exist in the vault: run `scripts/wiki-context.sh --project {PROJECT} --budget 6000` for bounded orientation, then use `scripts/vault-search.sh` / `scripts/vault-read.sh` for detail pages on demand. Do not wait for the user to say “Obsidian” explicitly.
+6. **Maintain the context, don't just consume it.** If wiki/vault context is stale, low-confidence, contradicted, or user-corrected, run `scripts/wiki-maintain.sh --project {PROJECT}` to surface issues, then capture the corrected synthesis with `scripts/wiki-capture.sh --confidence high --supersedes {old-path}` or mark contested information with `--contested`. Never silently rely on polluted context; either verify, supersede, or flag it.
 
 ## Codex Integration
 

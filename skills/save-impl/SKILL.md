@@ -34,8 +34,11 @@ Delegate to `archivist` agent (haiku):
 9. **Set properties** — if issue/PR available:
    - `scripts/vault-update.sh property-set --path {IMPL_REL_PATH} --key issue --value "#{N}"`
    - `scripts/vault-update.sh property-set --path {IMPL_REL_PATH} --key pr --value "#{N}"`
-10. **Cleanup** — `rm /tmp/agmo-vault-{uuid}.md`
-11. **Report** — output saved path, index update, plan backlink status
+10. **Optional llm-wiki capture** — if the implementation changed a durable workflow, API contract, decision, or QA pattern, capture a short agent-facing summary:
+    `scripts/wiki-capture.sh --project {PROJECT} --title "{title}" --type impl --source "save-impl" --confidence high --file /tmp/agmo-vault-{uuid}.md`
+    - Keep this summary compact; Obsidian implementation notes remain the full human-facing record.
+11. **Cleanup** — `rm /tmp/agmo-vault-{uuid}.md`
+12. **Report** — output saved path, index update, plan backlink status, and whether llm-wiki capture was created
 
 ## Vault Path
 

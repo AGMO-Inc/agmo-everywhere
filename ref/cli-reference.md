@@ -40,6 +40,31 @@ obsidian append file="{note_name}" content="{content}"
 obsidian prepend file="{note_name}" content="{content}"
 ```
 
+## llm-wiki Context Scripts
+
+These scripts do not require the Obsidian CLI. They use the configured vault root from `AGMO_VAULT_ROOT` or `~/.agmo/config`.
+
+```bash
+# Initialize agent-facing compiled context spine
+scripts/wiki-init.sh --project "{project}"
+
+# Capture durable agent-facing context from a file
+scripts/wiki-capture.sh --project "{project}" --title "{title}" --type decision --source "plan" --file /tmp/summary.md
+
+# Capture from stdin
+printf '%s\n' "Durable summary" | scripts/wiki-capture.sh --project "{project}" --title "{title}"
+
+# Emit bounded markdown context for session-start
+scripts/wiki-context.sh --project "{project}" --budget 6000
+
+# Emit parseable JSON with included/omitted metadata
+scripts/wiki-context.sh --project "{project}" --budget 6000 --format json
+
+# Audit compiled context for stale, low-confidence, contested, or broken entries
+scripts/wiki-maintain.sh --project "{project}" --max-age-days 90
+scripts/wiki-maintain.sh --project "{project}" --max-age-days 90 --format json
+```
+
 ## Metadata
 
 ```bash

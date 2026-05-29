@@ -107,45 +107,22 @@ else
   PROJECT_NAME="$(basename "$PWD")"
 fi
 
-# Read wisdom files, respecting token budget
-wisdom_content=""
-chars_used=0
-
-read_wisdom_file() {
-  local file="$1"
-  local label="$2"
-  if [ -f "$file" ] && [ -s "$file" ]; then
-    local content
-    content="$(cat "$file")"
-    local content_len=${#content}
-    if [ $((chars_used + content_len + ${#label} + 4)) -le $MAX_WISDOM_CHARS ]; then
-      wisdom_content="${wisdom_content}### ${label}"$'\n'"${content}"$'\n\n'
-      chars_used=$((chars_used + content_len + ${#label} + 4))
-    fi
-  fi
-}
-
-if [[ -n "$VAULT_ROOT" && -d "$VAULT_ROOT" ]]; then
-  # Project wisdom first (priority)
-  if [ -n "$PROJECT_NAME" ] && [ -d "${VAULT_ROOT}/${PROJECT_NAME}/wisdom" ]; then
-    read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/learnings.md" "${PROJECT_NAME} — Learnings"
-    read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/decisions.md" "${PROJECT_NAME} — Decisions"
-    read_wisdom_file "${VAULT_ROOT}/${PROJECT_NAME}/wisdom/issues.md" "${PROJECT_NAME} — Issues"
-  fi
-
-  # Shared wisdom (remaining budget)
-  if [ -d "${VAULT_ROOT}/shared/wisdom" ]; then
-    read_wisdom_file "${VAULT_ROOT}/shared/wisdom/learnings.md" "Shared — Learnings"
-    read_wisdom_file "${VAULT_ROOT}/shared/wisdom/decisions.md" "Shared — Decisions"
-    read_wisdom_file "${VAULT_ROOT}/shared/wisdom/issues.md" "Shared — Issues"
+# Read bounded llm-wiki context. The wiki-context script includes the
+# agent-facing context spine first, then selected project/shared wisdom as a
+# budgeted fallback. This avoids dumping whole wisdom files into every session.
+wiki_context=""
+if [[ -n "$VAULT_ROOT" && -d "$VAULT_ROOT" && -n "$PROJECT_NAME" ]]; then
+  WIKI_CONTEXT_SCRIPT="${PLUGIN_ROOT}/scripts/wiki-context.sh"
+  if [ -f "$WIKI_CONTEXT_SCRIPT" ]; then
+    wiki_context="$(bash "$WIKI_CONTEXT_SCRIPT" --project "$PROJECT_NAME" --budget "${AGMO_CONTEXT_BUDGET_CHARS:-$MAX_WISDOM_CHARS}" 2>/dev/null || true)"
   fi
 fi
 
-# Build full context: skill content + wisdom
+# Build full context: skill content + bounded compiled context
 context="${SKILL_CONTENT}"
 
-if [ -n "$wisdom_content" ]; then
-  context="${context}"$'\n\n'"## Inherited Wisdom (${PROJECT_NAME})"$'\n\n'"${wisdom_content}"
+if [ -n "$wiki_context" ]; then
+  context="${context}"$'\n\n'"${wiki_context}"
 fi
 
 context="${context}"$'\n\n'"## Vault Configuration"$'\n'"AGMO_VAULT_ROOT=${VAULT_ROOT}"
