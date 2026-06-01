@@ -114,7 +114,12 @@ wiki_context=""
 if [[ -n "$VAULT_ROOT" && -d "$VAULT_ROOT" && -n "$PROJECT_NAME" ]]; then
   WIKI_CONTEXT_SCRIPT="${PLUGIN_ROOT}/scripts/wiki-context.sh"
   if [ -f "$WIKI_CONTEXT_SCRIPT" ]; then
-    wiki_context="$(bash "$WIKI_CONTEXT_SCRIPT" --project "$PROJECT_NAME" --budget "${AGMO_CONTEXT_BUDGET_CHARS:-$MAX_WISDOM_CHARS}" 2>/dev/null || true)"
+    WIKI_MODE="${AGMO_CONTEXT_MODE:-manifest}"
+    case "$WIKI_MODE" in
+      full) MODE_FLAG="--full" ;;
+      *)    MODE_FLAG="--manifest" ;;
+    esac
+    wiki_context="$(bash "$WIKI_CONTEXT_SCRIPT" --project "$PROJECT_NAME" --budget "${AGMO_CONTEXT_BUDGET_CHARS:-$MAX_WISDOM_CHARS}" $MODE_FLAG 2>/dev/null || true)"
   fi
 fi
 
