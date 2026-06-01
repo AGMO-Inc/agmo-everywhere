@@ -3,6 +3,24 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.1] - 2026-06-01
+
+### Changed
+- session-start llm-wiki 주입을 eager 본문 덤프에서 lazy manifest(지도) 포인터로 전환 — 기본 모드 `manifest`, 전체 본문은 `AGMO_CONTEXT_MODE=full`로 옵트인 (`hooks/session-start`, `scripts/wiki-context.sh`)
+- `wiki-context.sh`에 `--manifest`/`--full` 모드 추가 — manifest는 페이지 제목·요약·카운트만 담은 ≤800자 지도를 출력하고 본문은 on-demand로 lazy 로드
+- `using-plugin` 부트스트랩에 LLM Wiki lazy-loading 안내를 추가하고, Category Routing 상세 표를 `skills/using-plugin/references/category-routing.md`로 분리해 매 세션 eager 주입 토큰을 절감
+- 스킬 카탈로그 카운트 28 → 29 (plugin.json / marketplace.json / README)
+
+### Added
+- `wiki-maintain` 스킬 신설 — llm-wiki 오염(모순·저신뢰·contested·superseded) 감지 시 호출 가능한 자가치유 워크플로우 (`skills/wiki-maintain/`)
+- `AGMO_MANIFEST_HEALTH=1` 옵트인 — manifest 끝에 high-severity wiki 이슈 경고 한 줄 추가
+- manifest/full 모드 회귀 테스트 (full byte-identical, manifest ≤800자, budget exit code)
+
+### Rationale
+- 매 세션 모든 컨텍스트를 eager 주입하던 방식을 "llm-wiki 존재만 인지시키고 필요할 때 lazy 로드"하는 모델로 전환해 세션시작 토큰 예산을 절감 (데이터 보유 프로젝트 기준 13,090자 → 8,893자, 약 4,197자 절감)
+- 잘못된 지식베이스를 에이전트가 스스로 점검·수정할 수 있도록 `wiki-maintain`을 호출 가능한 스킬로 승격
+- 하위호환: `AGMO_CONTEXT_MODE=full`로 기존 eager 동작을 보존하며, `--full` 출력은 이전과 byte-identical
+
 ## [0.8.0] - 2026-05-29
 
 ### Added

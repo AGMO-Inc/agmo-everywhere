@@ -1,2 +1,5 @@
 .plans/
 implement-page-workspace/
+.DS_Store
+.agmo/
+.omx/

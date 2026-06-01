@@ -93,6 +93,32 @@ if printf '%s' "$ctx_after_supersede" | grep -Fq "Old unverified claim"; then
   exit 1
 fi
 
+# --full flag produces byte-identical output to no-flag (default mode is full).
+full_out="$(bash scripts/wiki-context.sh --project demo --budget 10000 --full)"
+default_out="$(bash scripts/wiki-context.sh --project demo --budget 10000)"
+diff_result="$(diff <(printf '%s' "$full_out") <(printf '%s' "$default_out"))"
+test -z "$diff_result" || { echo "--full vs no-flag output differs: $diff_result" >&2; exit 1; }
+
+# --manifest emits compact metadata (≤800 chars) and includes the capture title.
+manifest_out="$(bash scripts/wiki-context.sh --project demo --manifest)"
+manifest_chars="$(printf '%s' "$manifest_out" | wc -c | tr -d ' ')"
+test "$manifest_chars" -le 800 || { echo "manifest exceeded 800 chars: $manifest_chars" >&2; exit 1; }
+assert_contains "$manifest_out" "API/Auth: token rules?"
+
+# --budget with invalid value (non-numeric) exits with code 3.
+set +e
+bash scripts/wiki-context.sh --project demo --budget abc >/dev/null 2>&1
+budget_code=$?
+set -e
+test "$budget_code" -eq 3 || { echo "expected budget invalid exit 3, got $budget_code" >&2; exit 1; }
+
+# --budget 0 (zero) also exits with code 3.
+set +e
+bash scripts/wiki-context.sh --project demo --budget 0 >/dev/null 2>&1
+budget_zero_code=$?
+set -e
+test "$budget_zero_code" -eq 3 || { echo "expected budget 0 exit 3, got $budget_zero_code" >&2; exit 1; }
+
 # session-start remains valid JSON and includes compiled context when present.
 hook_json="$(printf '{"session_id":"test-session"}' | PATH="/usr/bin:/bin" bash hooks/session-start)"
 printf '%s' "$hook_json" | python3 -m json.tool >/dev/null
