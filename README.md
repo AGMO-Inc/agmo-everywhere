@@ -4,7 +4,7 @@
 
 **Claude Code 플러그인 — 8개 에이전트, 29개 온디맨드 스킬, Obsidian 중심 워크플로우**
 
-[![Version](https://img.shields.io/badge/version-0.8.1-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.8.1)
+[![Version](https://img.shields.io/badge/version-0.8.2-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.8.2)
 [![Agents](https://img.shields.io/badge/agents-8-green.svg)](#에이전트-agents)
 [![Skills](https://img.shields.io/badge/skills-29-orange.svg)](#스킬-카탈로그-skills)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
@@ -65,7 +65,7 @@ claude plugin install agmo
 1. **Conductor, not Performer** — 오케스트레이터는 직접 코드를 작성하지 않고 전문 에이전트에게 위임합니다.
 2. **Evidence before Claims** — "완료"라고 선언하기 전에 반드시 검증 증거를 확보합니다.
 3. **YAGNI** — 명시적으로 요청된 것만 구현합니다. 추측에 의한 기능 추가를 금지합니다.
-4. **Token Efficiency** — 카테고리 라우팅으로 작업 복잡도에 맞는 모델을 자동 선택합니다. (`haiku` / `sonnet` / `opus`)
+4. **Token Efficiency** — 카테고리 라우팅으로 작업 복잡도에 맞는 모델을 자동 선택합니다. (`haiku` / `sonnet` / `fable`)
 5. **Obsidian is the Hub** — 모든 문서(플랜, 설계, 구현 기록)의 원본은 Obsidian vault에 저장합니다.
 
 ---
@@ -162,14 +162,14 @@ Wisdom은 프로젝트에서 축적된 **학습, 결정, 이슈**를 기록하�
 
 | Agent | Role | Model |
 |-------|------|-------|
-| `executor` | 코드 작성 및 수정 | haiku / sonnet / opus (라우팅) |
+| `executor` | 코드 작성 및 수정 | haiku / sonnet / fable (라우팅) |
 | `explore` | 코드베이스 탐색 | haiku (기본) |
 | `archivist` | Obsidian vault 작업 | haiku (기본) |
-| `frontend` | 프론트엔드 품질 검증 (visual, accessibility, responsive) | opus (고정) |
-| `android-specialist` | Android 프론트엔드 품질 검증 (visual, accessibility, responsive) | opus (고정) |
-| `architect` | 분석, 검증, 디버깅 | opus (고정) |
-| `planner` | 계획 수립 | opus (고정) |
-| `critic` | 리뷰 및 비평 | opus (고정) |
+| `frontend` | 프론트엔드 품질 검증 (visual, accessibility, responsive) | fable (고정) |
+| `android-specialist` | Android 프론트엔드 품질 검증 (visual, accessibility, responsive) | fable (고정) |
+| `architect` | 분석, 검증, 디버깅 | fable (고정) |
+| `planner` | 계획 수립 | fable (고정) |
+| `critic` | 리뷰 및 비평 | fable (고정) |
 
 ---
 
