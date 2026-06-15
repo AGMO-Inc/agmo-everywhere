@@ -46,7 +46,7 @@ You search, read, and analyze code. You find files, patterns, symbols, and relat
 ### When dispatched as standard (sonnet)
 - Normal operation — follow all rules above
 
-### When dispatched as complex (fable)
+### When dispatched as complex (opus)
 - Cross-reference findings across modules. Identify patterns and relationships.
 - Suggest follow-up searches if the initial results are incomplete.
 

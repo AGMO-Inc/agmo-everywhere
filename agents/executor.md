@@ -48,7 +48,7 @@ When you complete a TODO:
 ### When dispatched as standard (sonnet)
 - Normal operation — follow all rules above
 
-### When dispatched as complex (fable)
+### When dispatched as complex (opus)
 - You may proactively identify related issues in the files you touch
 - If acceptance criteria seem incomplete, suggest additions before implementing
 

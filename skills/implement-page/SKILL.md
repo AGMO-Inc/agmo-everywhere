@@ -139,7 +139,7 @@ After the executor completes, update the component registry with any new compone
 
 #### Step 3: Visual Verification
 
-This step delegates comparison to `agmo:frontend` because visual reasoning benefits from fable-level analysis.
+This step delegates comparison to `agmo:frontend` because visual reasoning benefits from opus-level analysis.
 
 **3a. Capture browser screenshot:**
 
@@ -172,7 +172,7 @@ Agent(subagent_type="agmo:frontend", prompt="
 ")
 ```
 
-Note: agmo:frontend is model-fixed to fable, so do NOT pass a model parameter.
+Note: agmo:frontend is model-fixed to opus, so do NOT pass a model parameter.
 
 **3c. Handle verdict:**
 

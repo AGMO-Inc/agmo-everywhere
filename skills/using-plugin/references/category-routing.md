@@ -2,7 +2,7 @@
 
 ## Category Routing
 
-**agmo:planner, agmo:architect, agmo:critic, agmo:frontend, agmo:android-specialist** are model-fixed to **fable**. Do NOT pass `model` parameter — they use their own.
+**agmo:planner, agmo:architect, agmo:critic, agmo:frontend, agmo:android-specialist** are model-fixed to **opus**. Do NOT pass `model` parameter — they use their own.
 
 **agmo:executor, agmo:explore, agmo:archivist** use category routing — pass `model` explicitly:
 
@@ -12,7 +12,7 @@
 |----------|-------|-------------|
 | `quick` | `haiku` | 1-line change, file save, Obsidian operations, config edits |
 | `standard` | `sonnet` | Feature implementation, multi-file changes, most coding work |
-| `complex` | `fable` | Architecture-sensitive changes, complex refactoring |
+| `complex` | `opus` | Architecture-sensitive changes, complex refactoring |
 
 ### agmo:explore routing
 
@@ -22,7 +22,7 @@
 |----------|-------|-------------|
 | `quick` | `haiku` | **Default.** File search, pattern matching, reading files, Obsidian vault search, symbol lookup, git log/blame |
 | `standard` | `sonnet` | Cross-file dependency analysis, understanding complex architecture, multi-step investigation requiring reasoning |
-| `complex` | `fable` | Deep architectural analysis spanning 10+ files, security audit-level codebase scanning |
+| `complex` | `opus` | Deep architectural analysis spanning 10+ files, security audit-level codebase scanning |
 
 ### agmo:archivist routing
 
@@ -46,14 +46,14 @@ Agent(subagent_type="agmo:explore", model="sonnet", prompt="...")   # complex in
 Agent(subagent_type="agmo:archivist", model="haiku", prompt="...")    # default
 Agent(subagent_type="agmo:archivist", model="sonnet", prompt="...")   # note-to-issue only
 
-# Model-fixed agents — do NOT pass model (they use fable)
+# Model-fixed agents — do NOT pass model (they use opus)
 Agent(subagent_type="agmo:planner", prompt="...")
 Agent(subagent_type="agmo:architect", prompt="...")
 Agent(subagent_type="agmo:critic", prompt="...")
 
-# agmo:frontend — model-fixed to fable, do NOT pass model
+# agmo:frontend — model-fixed to opus, do NOT pass model
 Agent(subagent_type="agmo:frontend", prompt="...")
 
-# agmo:android-specialist — model-fixed to fable, do NOT pass model
+# agmo:android-specialist — model-fixed to opus, do NOT pass model
 Agent(subagent_type="agmo:android-specialist", prompt="...")
 ```

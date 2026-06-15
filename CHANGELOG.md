@@ -3,6 +3,13 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.3] - 2026-06-15
+
+### Changed
+- 모델 고정 에이전트(planner/architect/critic/frontend/android-specialist)를 `claude-fable-5`에서 `claude-opus-4-8`로 환원
+- 카테고리 라우팅 complex 티어를 fable → opus로 전환 (executor/explore), 관련 스킬 문서(using-plugin, category-routing, execute, implement-page, implement-page-android, plugin-review) 및 README 동기화
+- 버전 0.8.3 (plugin.json / marketplace.json / README)
+
 ## [0.8.2] - 2026-06-10
 
 ### Changed
