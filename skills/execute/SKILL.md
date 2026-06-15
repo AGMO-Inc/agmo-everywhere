@@ -41,7 +41,7 @@ For each TODO (respecting dependency order):
 1. Dispatch executor agent with appropriate category
    - quick (haiku): simple file changes, config updates
    - standard (sonnet): feature implementation, most work
-   - complex (fable): complex logic, architectural changes
+   - complex (opus): complex logic, architectural changes
 
 2. Executor completes the TODO and reports results
 

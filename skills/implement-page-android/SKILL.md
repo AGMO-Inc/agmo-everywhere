@@ -171,7 +171,7 @@ After 3 consecutive failures: log the compile errors, move on to the next frame 
 
 #### Step 3: Visual Verification
 
-This step delegates comparison to `agmo:android-specialist` because visual reasoning benefits from fable-level analysis.
+This step delegates comparison to `agmo:android-specialist` because visual reasoning benefits from opus-level analysis.
 
 **3a. Capture Compose Preview screenshot:**
 
@@ -204,7 +204,7 @@ Agent(subagent_type="agmo:android-specialist", prompt="
 ")
 ```
 
-Note: agmo:android-specialist is model-fixed to fable, so do NOT pass a model parameter.
+Note: agmo:android-specialist is model-fixed to opus, so do NOT pass a model parameter.
 
 **3c. Handle verdict:**
 

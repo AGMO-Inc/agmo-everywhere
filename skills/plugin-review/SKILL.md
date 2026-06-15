@@ -36,7 +36,7 @@ Delegate to `architect` agent with the JSON output. The architect should analyze
 
 #### Agent & Model Distribution
 - Agent dispatch counts by type
-- Model distribution: haiku% / sonnet% / fable%
+- Model distribution: haiku% / sonnet% / opus%
 - Category routing accuracy: are executor/explore/archivist routed to appropriate model tiers?
 - Naming consistency: detect `agmo:` prefix vs bare name dispatches
 
@@ -63,7 +63,7 @@ Structure the report as:
 - Sessions: N (across M projects)
 - Top skills: skill1 (X), skill2 (Y), skill3 (Z)
 - Agent distribution: executor (A%), explore (B%), architect (C%)
-- Model distribution: haiku (X%), sonnet (Y%), fable (Z%)
+- Model distribution: haiku (X%), sonnet (Y%), opus (Z%)
 
 ### Per-Project Breakdown
 | Project | Sessions | Top Skills | Top Agents |
@@ -82,7 +82,7 @@ Structure the report as:
 - "{skill}" triggered N times but cancelled M times → trigger too sensitive
 
 #### Routing
-- executor:fable used N times → review if sonnet suffices
+- executor:opus used N times → review if sonnet suffices
 - explore:sonnet used N times → most explores are quick, default haiku
 
 #### Tokens
