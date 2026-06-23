@@ -3,6 +3,18 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.4] - 2026-06-24
+
+### Added
+- `debt` 스킬 신설 — 코드의 `// debt:` / `# debt:` 마커를 수집해 ledger로 만드는 읽기 전용 one-shot 스킬. 요청 시 Obsidian vault `{PROJECT}/debt-ledger.md`에 저장하고, `upgrade:` 트리거 충족 항목은 `agmo:plan`으로 넘길지 제안하는 느슨한 핸드오프 포함 (`skills/debt/`)
+- executor에 `## Solution Discipline` 신설 — ponytail 게으름 사다리(7-rung) 주입: YAGNI → 코드베이스 재사용 → stdlib → native 플랫폼 기능 → 기존 의존성 → one-liner → 최소 코드. 근본원인 수정(모든 호출자 grep), `// debt:` 마커 컨벤션(Rule 3 예외), 단순화 금지선(trust-boundary 검증·데이터손실 방지·보안·접근성) 포함 (`agents/executor.md`)
+- code-review / critic에 과잉엔지니어링 렌즈 — `delete:` `stdlib:` `native:` `yagni:` `shrink:` 태그 포맷 + `net: -N lines possible`. correctness/security/performance와 별개 축이며 IMPORTANT/MINOR로만 분류(zero-CRITICAL=APPROVE 규칙 유지) (`skills/code-review/`, `agents/critic.md`)
+
+### Changed
+- planner Rule 6(YAGNI) 강화 — TODO 분해 시 재사용/stdlib/native/기존코드 우선, 단일구현 추상화·아무도 안 읽는 config·단일호출자 레이어 계획 금지 (`agents/planner.md`)
+- brainstorming — Propose Approaches에 "가장 게으른(최소한의) 접근 우선" 추가, Scope boundaries(YAGNI)에 게으름 사다리 적용 (`skills/brainstorming/`)
+- 스킬 카탈로그 카운트 29 → 30 (plugin.json / marketplace.json / README / using-plugin)
+
 ## [0.8.3] - 2026-06-15
 
 ### Changed

@@ -45,6 +45,7 @@ Does the implementation match the plan/spec? Check each TODO's acceptance criter
 - Security (OWASP top 10)
 - Performance (obvious issues only)
 - Consistency with existing codebase patterns
+- Over-engineering lens (separate axis) — tag findings: `delete:` (dead/speculative code), `stdlib:` (hand-rolled standard library), `native:` (platform already does it), `yagni:` (single-implementation abstraction/config), `shrink:` (same logic, fewer lines). Format: `<location>: <tag> <what>. <replacement>.` End with `net: -N lines possible.` or `Lean already.`. Classify as IMPORTANT/MINOR only — never CRITICAL; does not block approval.
 
 ## Output Format
 

@@ -63,7 +63,15 @@ Review for:
 2. **Security** — injection, XSS, auth bypass, secrets in code
 3. **Performance** — obvious N+1 queries, unnecessary loops, missing indexes
 4. **Consistency** — follows existing codebase patterns and conventions
-5. **Simplicity** — no over-engineering, no unnecessary abstractions
+5. **Over-engineering lens** — a separate axis from correctness/security/performance. Scan for needless complexity using these tags, one finding per line:
+   - `delete:` — dead code or speculative feature (replacement: none)
+   - `stdlib:` — hand-rolled standard library (name the stdlib function)
+   - `native:` — work the platform already does (name the native feature)
+   - `yagni:` — abstraction or config with a single implementation
+   - `shrink:` — same logic, fewer lines
+   Format each line as: `<location>: <tag> <what>. <replacement>.`
+   End with `net: -N lines possible.`, or `Lean already.` if nothing to cut.
+   Classify these findings as IMPORTANT or MINOR only — never CRITICAL. They do NOT block approval (the zero-CRITICAL = APPROVE rule stands).
 
 Do NOT review:
 - Style preferences (formatting, naming) unless inconsistent with codebase
@@ -117,6 +125,10 @@ Overall: APPROVE / REQUEST_CHANGES
 
 #### MINOR
 - [finding]: [action needed]
+
+#### Over-engineering Lens
+- <location>: <tag> <what>. <replacement>.
+net: -N lines possible.   (or: Lean already.)
 
 ### Stage 3: Plan Completion Audit
 - [x] TODO 1: title — Implemented

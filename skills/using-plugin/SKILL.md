@@ -30,7 +30,7 @@ Before processing any request, determine its weight:
 
 When in doubt, invoke a skill. If there is even a 1% chance a skill applies, load it.
 
-## Skill Catalog (29 skills)
+## Skill Catalog (30 skills)
 
 Invoke via the `Skill` tool with `agmo:skillname`.
 
@@ -94,6 +94,7 @@ Invoke via the `Skill` tool with `agmo:skillname`.
 | `retro` | User wants weekly retrospective based on git history. "회고", "retro", "이번 주 정리" |
 | `security-audit` | User wants security review of the codebase. "보안 점검", "security audit" |
 | `benchmark` | User wants performance benchmarking. "벤치마크", "benchmark", "성능 측정" |
+| `debt` | User wants to harvest `debt:` markers into a ledger. "부채", "기술부채", "debt", "지름길 정리" |
 
 ## Agents (8)
 

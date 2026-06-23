@@ -2,11 +2,11 @@
 
 # Agmo Everywhere
 
-**Claude Code 플러그인 — 8개 에이전트, 29개 온디맨드 스킬, Obsidian 중심 워크플로우**
+**Claude Code 플러그인 — 8개 에이전트, 30개 온디맨드 스킬, Obsidian 중심 워크플로우**
 
-[![Version](https://img.shields.io/badge/version-0.8.3-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.8.3)
+[![Version](https://img.shields.io/badge/version-0.8.4-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.8.4)
 [![Agents](https://img.shields.io/badge/agents-8-green.svg)](#에이전트-agents)
-[![Skills](https://img.shields.io/badge/skills-29-orange.svg)](#스킬-카탈로그-skills)
+[![Skills](https://img.shields.io/badge/skills-30-orange.svg)](#스킬-카탈로그-skills)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
 [![Obsidian](https://img.shields.io/badge/hub-Obsidian-purple.svg)](#왜-obsidian인가-why-obsidian)
 
@@ -179,7 +179,7 @@ Wisdom은 프로젝트에서 축적된 **학습, 결정, 이슈**를 기록하�
 |----------|------|
 | **워크플로우** | `brainstorming`, `plan`, `plan-review`, `execute`, `ralph` |
 | **품질** | `tdd`, `verification`, `code-review`, `debugging`, `accessibility` |
-| **분석** | `retro`, `security-audit`, `benchmark` |
+| **분석** | `retro`, `security-audit`, `benchmark`, `debt` |
 | **Obsidian** | `save-plan`, `save-impl`, `save-note`, `vault-search`, `note-to-issue`, `wisdom` |
 | **Git** | `git-workflow` |
 | **Figma** | `implement-page`, `implement-page-android` |
