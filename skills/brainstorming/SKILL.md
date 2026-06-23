@@ -46,6 +46,7 @@ Once the idea is clear, present **2-3 approaches** with tradeoffs:
 ```
 
 State your recommendation and why.
+Prefer the **laziest (= most minimal) approach that works** — bias toward reuse, the standard library, native features, and existing code over new abstractions.
 
 ### 4. Present Design
 
@@ -54,7 +55,7 @@ After the user picks an approach, present the design in sections. After each sec
 - **Architecture** — components and their relationships
 - **Data flow** — how data moves through the system
 - **Error handling** — what can go wrong and how to handle it
-- **Scope boundaries** — what is explicitly OUT of scope (YAGNI)
+- **Scope boundaries** — what is explicitly OUT of scope (YAGNI). Use the laziness ladder (reuse → stdlib → native → existing dependency → one-liner) to decide what stays OUT.
 
 Scale each section to complexity: a simple feature gets 2-3 sentences per section, a complex system gets a paragraph.
 
