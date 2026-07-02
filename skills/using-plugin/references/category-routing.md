@@ -2,7 +2,7 @@
 
 ## Category Routing
 
-**agmo:planner, agmo:architect, agmo:critic, agmo:frontend, agmo:android-specialist** are model-fixed to **opus**. Do NOT pass `model` parameter — they use their own.
+**agmo:planner, agmo:critic** are model-fixed to **claude-fable-5**. **agmo:architect, agmo:frontend, agmo:android-specialist** are model-fixed to **opus**. Do NOT pass `model` parameter for any of them — they use their own.
 
 **agmo:executor, agmo:explore, agmo:archivist** use category routing — pass `model` explicitly:
 
@@ -46,10 +46,12 @@ Agent(subagent_type="agmo:explore", model="sonnet", prompt="...")   # complex in
 Agent(subagent_type="agmo:archivist", model="haiku", prompt="...")    # default
 Agent(subagent_type="agmo:archivist", model="sonnet", prompt="...")   # note-to-issue only
 
-# Model-fixed agents — do NOT pass model (they use opus)
+# agmo:planner, agmo:critic — model-fixed to claude-fable-5, do NOT pass model
 Agent(subagent_type="agmo:planner", prompt="...")
-Agent(subagent_type="agmo:architect", prompt="...")
 Agent(subagent_type="agmo:critic", prompt="...")
+
+# agmo:architect — model-fixed to opus, do NOT pass model
+Agent(subagent_type="agmo:architect", prompt="...")
 
 # agmo:frontend — model-fixed to opus, do NOT pass model
 Agent(subagent_type="agmo:frontend", prompt="...")

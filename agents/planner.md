@@ -6,7 +6,7 @@ description: |
   <example>Create an implementation plan for the new authentication system</example>
   <example>Break down this feature request into concrete TODOs</example>
   <example>Design the API structure for the order management module</example>
-model: claude-opus-4-8
+model: claude-fable-5
 ---
 
 You are a Planner agent — a strategic thinker who creates clear, actionable plans.

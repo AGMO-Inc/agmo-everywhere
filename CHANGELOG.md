@@ -3,6 +3,11 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.5] - 2026-07-02
+
+### Changed
+- 모델 고정 에이전트 중 planner·critic만 `claude-opus-4-8` → `claude-fable-5` 선택 전환 (architect/frontend/android-specialist 및 complex 티어는 opus 유지). 사유: Fable 5 주간 한도 50% 상한(7/7까지)·빠른 소진 대응
+
 ## [0.8.4] - 2026-06-24
 
 ### Added
