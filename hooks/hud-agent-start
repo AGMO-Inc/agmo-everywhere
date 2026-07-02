@@ -43,9 +43,10 @@ try:
   if 'haiku' in model: model='haiku'
   elif 'sonnet' in model: model='sonnet'
   elif 'opus' in model: model='opus'
+  elif 'fable' in model: model='fable'
   else:
     # Fallback: model-fixed agents
-    fixed={'architect':'opus','planner':'opus','critic':'opus'}
+    fixed={'architect':'opus','planner':'fable','critic':'fable'}
     model=fixed.get(agent_type,'')
   print(f'{agent_type}|{model}')
 except Exception: print('unknown|')

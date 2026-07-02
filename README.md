@@ -119,6 +119,7 @@ Wisdom은 프로젝트에서 축적된 **학습, 결정, 이슈**를 기록하�
 
 # Decisions
 - [2026-03-16] planner/architect/critic 에이전트 모델을 opus 고정 — 계획/분석에는 최상위 모델 필요 (confidence: high) (source: user)
+- [2026-07-02] planner·critic 에이전트 모델을 claude-fable-5로 선택 전환 (architect/frontend/android-specialist는 opus 유지) — Fable 5 주간 50% 상한(7/7까지) 대응 (confidence: high) (source: user)
 ```
 
 ---
@@ -168,8 +169,8 @@ Wisdom은 프로젝트에서 축적된 **학습, 결정, 이슈**를 기록하�
 | `frontend` | 프론트엔드 품질 검증 (visual, accessibility, responsive) | opus (고정) |
 | `android-specialist` | Android 프론트엔드 품질 검증 (visual, accessibility, responsive) | opus (고정) |
 | `architect` | 분석, 검증, 디버깅 | opus (고정) |
-| `planner` | 계획 수립 | opus (고정) |
-| `critic` | 리뷰 및 비평 | opus (고정) |
+| `planner` | 계획 수립 | fable5 (고정) |
+| `critic` | 리뷰 및 비평 | fable5 (고정) |
 
 ---
 
