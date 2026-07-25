@@ -3,6 +3,16 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.6] - 2026-07-25
+
+### Changed
+- 모델 고정 에이전트 architect·frontend·android-specialist를 `claude-opus-4-8` → `claude-opus-5`로 업그레이드 (`agents/architect.md`, `agents/frontend.md`, `agents/android-specialist.md`). planner·critic은 0.8.5의 `claude-fable-5` 유지
+- 버전 0.8.6 (plugin.json / marketplace.json / README). README 배지가 0.8.4에 머물러 있던 것도 함께 정정
+
+### Notes
+- alias(`opus`) 대신 명시 pin을 유지. CLI 번들 레지스트리상 `opus` alias는 provider별로 다르게 해석되며(`foundry` → `claude-opus-4-6`, `gateway` → `claude-opus-4-7`), 해석 시점도 설치된 CLI 버전에 종속되므로 릴리즈 단위 추적을 위해 명시 지정을 유지한다
+- 스킬/라우팅 문서는 일반 별칭 `opus`로만 참조하므로 변경 없음
+
 ## [0.8.5] - 2026-07-02
 
 ### Changed
