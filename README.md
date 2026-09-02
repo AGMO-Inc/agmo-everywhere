@@ -4,7 +4,7 @@
 
 **Claude Code 플러그인 — 8개 에이전트, 30개 온디맨드 스킬, Obsidian 중심 워크플로우**
 
-[![Version](https://img.shields.io/badge/version-0.8.6-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.8.6)
+[![Version](https://img.shields.io/badge/version-0.8.7-blue.svg)](https://github.com/AGMO-Inc/agmo-everywhere/releases/tag/v0.8.7)
 [![Agents](https://img.shields.io/badge/agents-8-green.svg)](#에이전트-agents)
 [![Skills](https://img.shields.io/badge/skills-30-orange.svg)](#스킬-카탈로그-skills)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
@@ -169,8 +169,8 @@ Wisdom은 프로젝트에서 축적된 **학습, 결정, 이슈**를 기록하�
 | `frontend` | 프론트엔드 품질 검증 (visual, accessibility, responsive) | opus (고정) |
 | `android-specialist` | Android 프론트엔드 품질 검증 (visual, accessibility, responsive) | opus (고정) |
 | `architect` | 분석, 검증, 디버깅 | opus (고정) |
-| `planner` | 계획 수립 | fable5 (고정) |
-| `critic` | 리뷰 및 비평 | fable5 (고정) |
+| `planner` | 계획 수립 | fable (고정) |
+| `critic` | 리뷰 및 비평 | fable (고정) |
 
 ---
 

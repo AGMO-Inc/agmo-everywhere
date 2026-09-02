@@ -3,6 +3,17 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.7] - 2026-09-02
+
+### Changed
+- 모델 고정 에이전트 planner·critic을 `claude-fable-5` → `claude-fable-5-1`로 업그레이드 (`agents/planner.md`, `agents/critic.md`). architect·frontend·android-specialist는 0.8.6의 `claude-opus-5` 유지
+- 스킬/라우팅 문서의 planner·critic 모델 표기를 opus 관례와 동일하게 일반 별칭 `fable`로 통일 (`skills/using-plugin/SKILL.md`, `skills/using-plugin/references/category-routing.md`, README 에이전트 표). 0.8.5부터 문서에 `claude-fable-5` / `fable5` 특정 버전이 적혀 있던 것과, `using-plugin/SKILL.md` 표가 planner·critic을 `opus (고정)`으로 잘못 표기하고 있던 것을 함께 정정
+- 버전 0.8.7 (plugin.json / marketplace.json / README)
+
+### Notes
+- frontmatter는 alias 대신 명시 pin 유지 (0.8.6 정책 동일). CLI 2.1.258 번들 레지스트리 기준 `fable` alias는 first-party에서 `claude-fable-5-1`, `gateway` provider에서는 `claude-fable-5`로 해석되며, 해석 결과는 설치된 CLI 버전의 내장 카탈로그에 종속됨
+- headless `claude --model fable` 및 서브에이전트 `model: fable` 실행으로 현재 환경에서 `claude-fable-5-1` 라우팅을 실측 확인. `ANTHROPIC_BASE_URL`(로컬 프록시)만으로는 gateway provider로 분류되지 않음
+
 ## [0.8.6] - 2026-07-25
 
 ### Changed
