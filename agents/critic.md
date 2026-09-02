@@ -6,7 +6,7 @@ description: |
   <example>Review this implementation plan for completeness and risks</example>
   <example>Check if this code matches the specification</example>
   <example>Evaluate whether the refactoring preserved all behavior</example>
-model: claude-fable-5
+model: claude-fable-5-1
 tools: Read, Grep, Glob, Bash
 ---
 

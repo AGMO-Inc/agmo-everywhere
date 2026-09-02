@@ -108,14 +108,14 @@ Dispatch agents via the `Agent` tool with `subagent_type` parameter.
 | `agmo:explore` | Search and read codebase | 카테고리 라우팅 | Finding files, patterns, symbols, vault search |
 | `agmo:archivist` | Obsidian vault operations | 카테고리 라우팅 | Vault save, search, update, index, issue conversion |
 | `agmo:architect` | Analyze, verify, debug | **opus (고정)** | Verification, debugging, impact analysis |
-| `agmo:planner` | Create plans and strategies | **opus (고정)** | Plan creation, brainstorming |
-| `agmo:critic` | Review and critique | **opus (고정)** | Plan review, code review |
+| `agmo:planner` | Create plans and strategies | **fable (고정)** | Plan creation, brainstorming |
+| `agmo:critic` | Review and critique | **fable (고정)** | Plan review, code review |
 | `agmo:frontend` | Frontend quality gate — visual, accessibility, responsive | **opus (고정)** | Figma vs browser comparison, WCAG review, responsive verification |
 | `agmo:android-specialist` | Android frontend quality gate — visual, accessibility, responsive (Compose) | **opus (고정)** | Figma vs Compose Preview comparison, Android WCAG review, responsive verification |
 
 ## Category Routing
 
-executor/explore/archivist를 dispatch할 때는 `references/category-routing.md`의 모델 라우팅 표를 읽어라. 요약: **planner·architect·critic·frontend·android-specialist = opus 고정(model 파라미터 전달 금지)**, **executor·explore·archivist = 카테고리 라우팅(haiku/sonnet/opus 명시 전달)**.
+executor/explore/archivist를 dispatch할 때는 `references/category-routing.md`의 모델 라우팅 표를 읽어라. 요약: **planner·critic = fable 고정, architect·frontend·android-specialist = opus 고정(둘 다 model 파라미터 전달 금지)**, **executor·explore·archivist = 카테고리 라우팅(haiku/sonnet/opus 명시 전달)**.
 
 ## Workflow Chains
 
@@ -146,7 +146,7 @@ User has a clear, scoped request with an existing plan
 1. **Conductor, not performer.** NEVER use Edit, Write, or NotebookEdit tools directly. All file modifications MUST go through the appropriate agent (executor for code, archivist for vault, planner for plans). If you catch yourself about to edit a file, STOP and delegate to the correct agent instead.
 2. **Evidence before claims.** Never say "done" without verification evidence.
 3. **YAGNI.** Only do what is explicitly requested.
-4. **Token efficiency.** planner/architect/critic은 항상 opus. executor/explore/archivist는 카테고리 라우팅 (haiku/sonnet/opus).
+4. **Token efficiency.** planner/critic은 항상 fable, architect는 항상 opus. executor/explore/archivist는 카테고리 라우팅 (haiku/sonnet/opus).
 5. **Obsidian is the hub; llm-wiki is the startup map.** Treat `AGMO_VAULT_ROOT` as the knowledge base root. At session start, read the injected `## LLM Wiki Context` as the first orientation layer. Before any non-trivial brainstorming, planning, implementation, review, or debugging task, assume relevant context may already exist in the vault: run `scripts/wiki-context.sh --project {PROJECT} --budget 6000` for bounded orientation, then use `scripts/vault-search.sh` / `scripts/vault-read.sh` for detail pages on demand. Do not wait for the user to say “Obsidian” explicitly.
 6. **Maintain the context, don't just consume it.** 오염(모순·low-confidence·contested·user-corrected) 감지 시 침묵하지 말고 `wiki-maintain` 스킬을 호출해 점검·수정한다.
 
