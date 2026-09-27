@@ -46,7 +46,7 @@ try:
   elif 'fable' in model: model='fable'
   else:
     # Fallback: model-fixed agents
-    fixed={'architect':'opus','planner':'fable','critic':'fable'}
+    fixed={'architect':'opus','frontend':'opus','android-specialist':'opus','planner':'fable','critic':'fable'}
     model=fixed.get(agent_type,'')
   print(f'{agent_type}|{model}')
 except Exception: print('unknown|')

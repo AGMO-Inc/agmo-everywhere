@@ -3,6 +3,19 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.8.8] - 2026-09-27
+
+### Changed
+- 모델 고정 에이전트 architect·frontend·android-specialist를 `claude-opus-5` → `claude-opus-5-5`로 업그레이드 (`agents/architect.md`, `agents/frontend.md`, `agents/android-specialist.md`). planner·critic은 0.8.7의 `claude-fable-5-1` 유지
+- 버전 0.8.8 (plugin.json / marketplace.json / README)
+
+### Fixed
+- HUD 훅의 모델 고정 에이전트 fallback 맵에 `frontend`·`android-specialist` 누락 → 모델 정보 미전달 시 HUD에 모델이 빈칸으로 표시되던 문제 수정 (`hooks/hud-agent-start`)
+
+### Notes
+- 스킬/라우팅 문서는 일반 별칭 `opus`로만 참조하므로 변경 없음
+- headless `claude --model claude-opus-5-5` 실행으로 CLI 2.1.283에서 라우팅 실측 확인
+
 ## [0.8.7] - 2026-09-02
 
 ### Changed
