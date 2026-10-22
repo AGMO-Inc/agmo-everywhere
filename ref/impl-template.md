@@ -46,6 +46,14 @@ tags:
 |--------|-----|------|
 | GET | `/path` | 설명 |
 
+## 결정 로그
+
+{decisions.tsv가 있을 때만 — save-impl 5a가 표로 변환해 삽입}
+
+| phase | todo | decision | why | evidence | result |
+|---|---|---|---|---|---|
+| execute | TODO 1 | 선택 | 근거 | 증거 | DONE |
+
 ## 검증 결과
 
 {빌드/테스트 실행 결과}
@@ -65,6 +73,7 @@ tags:
 | Key Implementation Details | O | Key logic/patterns |
 | Design Decisions | △ | When non-obvious decisions exist |
 | API Endpoints | △ | Only when API changes exist |
+| Decision Log | △ | Only when the session has decisions.tsv rows |
 | Verification Results | △ | Build/test results |
 
 △ = Include only when applicable. Omit unnecessary empty sections.

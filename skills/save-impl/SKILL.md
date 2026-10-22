@@ -17,6 +17,10 @@ Delegate to `archivist` agent (haiku):
    - Frontmatter (see `ref/frontmatter-schema.md` impl schema, `ref/impl-template.md` for body template)
    - Link to plan: `plan: "[[{PROJECT}/plans/[Plan] {plan title}]]"`
    - Body includes: implementation summary, changed files, key implementation details, design decisions
+   - **5a. Decision log** — the orchestrator passes `DECISIONS_TSV=${AGMO_STATE_DIR:-$HOME/.agmo/state}/sessions/${CLAUDE_CODE_SESSION_ID}/decisions.tsv` in the dispatch prompt (or `none`). If the file exists with at least one data row, convert it and insert a `## 결정 로그` section before `## 검증 결과`; otherwise omit the section.
+     ```bash
+     awk -F'\t' 'NR==1{print "| phase | todo | decision | why | evidence | result |"; print "|---|---|---|---|---|---|"; next} {gsub(/\|/,"\\|"); print "| "$2" | "$3" | "$4" | "$5" | "$6" | "$7" |"}' "$DECISIONS_TSV"
+     ```
 6. **Save** — `scripts/vault-save.sh --type impl --project {PROJECT} --title "{title}" --file /tmp/agmo-vault-{uuid}.md`
    - If `CREATED:` → proceed to step 7
    - If `DUPLICATE:{path}` → **return to orchestrator** with the duplicate path and new content summary. Orchestrator will ask user whether to update or skip.

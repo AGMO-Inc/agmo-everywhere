@@ -131,9 +131,10 @@ if projects_dir.is_dir():
             if not any(o[0] == name for o in others):
                 others.append((name, cnt))
     if others:
+        others.sort(key=lambda o: (-o[1], o[0]))
         lines.append("### 다른 프로젝트")
-        for name, cnt in others:
-            lines.append(f"- {name} ({cnt}건)")
+        lines.append(", ".join(f"{name}({cnt})" for name, cnt in others))
+        lines.append("로드: `wiki-context.sh --project <이름>`")
         lines.append("")
 
 # --- lookup guide ---

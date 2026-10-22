@@ -20,7 +20,7 @@ Before starting any phase, lock the original issue scope:
 
 ### Phase 1: Reproduce
 
-Confirm the failure is reproducible. Run the failing command/test and capture the exact error.
+Reproduce it yourself on the surface where it was observed (the same test, command, endpoint or UI path), and capture the exact error. If it does not reproduce directly, tighten the conditions or add instrumentation until it fires. Ask the user for reproduction conditions only with a stated reason the surface cannot be driven from here. Never move to a fix without a reproduction; a fix without a repro cannot be verified.
 
 ### Prior Learnings
 
@@ -37,6 +37,8 @@ Narrow down the scope:
 - Does the problem exist on a clean state?
 
 Delegate to `explore` agent (standard) to search for related code.
+
+Binary-search the cause: write the candidate hypotheses as a list, pick the check that cuts the most remaining hypotheses, get runtime evidence (log, debugger, failing assertion), eliminate, repeat until one survives. Record each refuted hypothesis and the change it motivated, if any. Confirm the surviving mechanism with runtime evidence before Phase 3.
 
 ### Phase 3: Trace Root Cause
 
@@ -63,12 +65,15 @@ Classify the error type before attempting a fix:
 
 ### Phase 4: Fix
 
+Evidence rule: every shipped line traces to runtime evidence from Phase 2-3. A "might help" change is a hypothesis, not a fix; it does not ship. Before delegating the fix, revert every change motivated by a hypothesis that was refuted (`git checkout -- <file>` or a targeted revert), so the diff contains only what the evidence justifies. The smallest change the evidence justifies ships, nothing more.
+
 Delegate to `executor` agent to implement the fix. Then run `agmo:verification`.
 
 ### Phase 4.5: Architecture Review (Escalation)
 
 If 3 fixes have failed:
 1. **STOP fixing code**
+1b. **Attack the premise.** Write down the one sentence that all three failed fixes assumed. Design one observation that would come out differently if that sentence were false, run it, and record the result. If the premise is refuted, the cause is elsewhere: return to Phase 2 with the new evidence. If it holds, continue to the architect.
 2. Delegate to `architect` agent:
    - Is the approach fundamentally wrong?
    - Are we solving the right problem?
@@ -98,8 +103,9 @@ Error context:
 ```
 
 **Sequential execution order:**
-1. Architect architecture review (existing Phase 4.5 behavior)
-2. `codex:codex-rescue` agent dispatch with architect's findings as input context
+1. Attack the premise (Phase 4.5 step 1b)
+2. Architect architecture review
+3. codex:codex-rescue dispatch
 
 **Handling Codex rescue results:**
 - Codex rescue output is **advisory only** — treat as "reference opinion"

@@ -3,6 +3,34 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.9.0] - 2026-10-22
+
+### Added
+- 결정 로그 스크립트: TODO마다 phase/todo/decision/why/evidence/result 1행을 세션 로컬 `decisions.tsv`에 append. pstack `skills/show-me-your-work/scripts/log.sh`(MIT) 포팅, bash+awk만 사용, 수식 인젝션 가드 포함 (`scripts/decision-log.sh`)
+- `handoff` 스킬: "핸드오프", "이어서 할 수 있게 정리해" 시 `resume.md`(intent/progress/verified/next/gotchas) 작성 (`skills/handoff/SKILL.md`)
+- 세션 핸드오프 자동 주입: `source`가 `compact`·`resume`이고 `resume.md`가 있을 때만 `## Session Handoff` 블록(1,500문자 상한, UTF-8 안전 자르기, decisions.tsv 행수 포인터) 주입. startup에서는 미생성 (`hooks/session-start`)
+- 리뷰 판정 참조: 버킷 4개(Act on/Consider/Noted/Dismissed) + 필터 5개 + Agreement Map + 설계 red flags 8개 (`skills/using-plugin/references/review-judgment.md`)
+- 원칙 인덱스 10개, 결정 근거가 필요할 때만 로드 (`skills/using-plugin/references/principles.md`)
+- code-review `--panel` opt-in: critic ∥ architect(또는 codex) 병렬 리뷰 후 오케스트레이터가 버킷으로 합성. 기본 경로 에이전트 호출 수 불변 (`skills/code-review/SKILL.md`)
+- 세션 상태 회귀 테스트, 스킬 디렉터리 수 = plugin.json 스킬 수 assert 포함 (`tests/session-state.test.sh`)
+
+### Changed
+- executor 디스패치 브리프를 GOAL/SCOPE/CONTEXT/ACCEPTANCE/VERIFY/TIMEBOX/FORBIDDEN/REPORT 8필드로 고정(TIMEBOX는 툴 호출 수 상한), TODO 완료마다 결정 로그 1행·resume.md 갱신. Direct 모드 설명을 using-plugin에서 execute로 이동 (`skills/execute/SKILL.md`, `skills/ralph/SKILL.md`, `skills/parallel/SKILL.md`)
+- critic이 발견마다 버킷을 자체 부여하고 플랜 리뷰에서 red flags 8개를 점검 (`agents/critic.md`)
+- executor 주석 규칙: 허용 예외 5개 밖 주석 금지, 단계 서술 주석 금지, 정확성 억제 주석은 원인 수정 우선. `// debt:` 예외 유지 (`agents/executor.md`). code-review Stage 1에 주석 정리(Cleanup) 항목 추가(예외 목록은 executor Rule 3 참조)
+- debugging: 실제 surface 재현, 가설 이진탐색, 반박된 가설이 만든 변경 revert, "might help" 변경 금지, 3회 실패 시 attack-the-premise → architect → codex rescue (`skills/debugging/SKILL.md`)
+- PR 본문을 Why/What changed/Scope/Tradeoffs/Blast Radius/Verification 6섹션으로 (`skills/git-workflow/SKILL.md`)
+- save-impl이 decisions.tsv를 표로 변환해 구현 노트 "결정 로그" 섹션에 첨부. 없으면 생략 (`skills/save-impl/SKILL.md`, `ref/impl-template.md`)
+- 세션 시작 주입 컨텍스트 9,348자 → 5,461자(≤ 5,500): Skill Catalog를 `이름 — 트리거` 한 줄 형식으로(헤딩 숫자 제거), Agents 표 3열, Category Routing·Key Principle 4 제거(모델 규칙은 Agents 표 한 곳), Wiki 안내와 Key Principle 5·6 병합, Workflow Chain 5줄, Key Principle 1 축약(세션 상태 파일 heredoc 예외 명시), 답변 작성 규칙 추가 (`skills/using-plugin/SKILL.md`)
+- wiki-context `--manifest`의 다른 프로젝트 목록을 건수 내림차순 한 문단으로 압축하고 로드 안내 1줄 추가(로드 안내는 `--project <이름>`만) (`scripts/wiki-context.sh`, `tests/wiki-context.test.sh`)
+- 스킬 31개 (handoff 추가; plugin.json / marketplace.json / README)
+- 버전 0.9.0 (plugin.json / marketplace.json / README)
+
+### Notes
+- 에이전트 8개 유지, 신규 훅 없음(session-start 읽기 전용 확장만). 상태 파일은 `~/.agmo/state/sessions/<id>/`에 세션 로컬, git 미포함
+- 스킬이 세션 id를 얻는 경로는 Bash 환경변수 `CLAUDE_CODE_SESSION_ID`(훅의 `session_id`와 동일 값 실측). decision-log.sh는 `--session` > `AGMO_SESSION_ID` > `CLAUDE_CODE_SESSION_ID` 순으로 해석
+- 보류: arena, why 스킬, reflect/correct, check-plan 린터, 역할별 모델 설정 파일, compact 전용 bootstrap
+
 ## [0.8.8] - 2026-09-27
 
 ### Changed

@@ -14,7 +14,7 @@ A persistence mechanism that ensures work continues until fully verified complet
 ```
 WHILE work remains:
   1. Check TODO list — any pending or failed?
-  2. If pending → dispatch executor with category routing
+  2. If pending → dispatch executor with the execute skill's step 1 brief (category routing)
   3. After each TODO → run verification
   4. If verification fails:
      - Collect failure context:
@@ -32,6 +32,7 @@ WHILE work remains:
      - If 3 failures → invoke debugging skill (include all 3 failure contexts)
      - If debugging resolves → continue
      - If debugging fails → report to user, pause
+  4b. After verification PASS → run the execute skill's step 5 (Record): one decision-log.sh row + resume.md refresh. A failure here prints one warning and never stops the loop.
   5. If all TODOs complete → run final verification (architect)
   6. If final verification passes → EXIT LOOP
   7. If final verification fails → address issues, re-verify
@@ -61,3 +62,4 @@ No complex JSON state files — progress is tracked in conversation context.
 3. **3-fix limit per TODO** — escalate to debugging after 3 failures
 4. **Report progress** — after each TODO, briefly state progress (e.g., "3/8 TODO 완료")
 5. **Respect cancel** — immediately stop when user requests cancellation
+6. **Record every verified TODO** — one decisions.tsv row and a resume.md refresh per loop iteration (same rule as execute). Resume from resume.md `next` after /compact; do not re-verify `verified` items.

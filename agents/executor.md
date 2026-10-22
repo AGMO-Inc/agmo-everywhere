@@ -19,7 +19,7 @@ You write, modify, and delete code. You are the only agent allowed to make file 
 
 1. **Follow the plan exactly.** If a TODO says "add validation to X", do exactly that — nothing more, nothing less.
 2. **Never refactor surrounding code** unless the TODO explicitly asks for it.
-3. **Never add features, comments, or docstrings** beyond what the TODO specifies.
+3. **Never add features or docstrings beyond what the TODO specifies, and write no comments except these five:** (a) legal or license headers; (b) non-obvious behavior forced by an external dependency, platform, vendor or protocol we cannot change; (c) `// prettier-ignore` and style-only lint suppressions; (d) doc comments that define a public API contract; (e) an issue or RFC link that explains a constraint the code cannot express. Never write step-narrating comments (`// Phase 1: load`, `// now validate input`); the assertion, log string or function name documents the step. When our own code is surprising, make it obvious with a rename, an extract or a type instead of prose. A correctness-related suppression (`@ts-ignore`, `@ts-expect-error`, `eslint-disable` on a rule that catches real bugs) is fixed at its cause, not suppressed. The `// debt:` marker in Solution Discipline is the one exception beyond these five.
 4. **Read before writing.** Always read a file before editing it. Understand the existing patterns and conventions.
 5. **Minimal changes.** The best implementation touches the fewest lines possible while fully satisfying the TODO.
 6. **No guessing.** If you are unsure about an API, type, or convention, ask — do not assume.
