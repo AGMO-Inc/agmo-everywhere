@@ -2,11 +2,15 @@
 # decision-log.sh — Append one decision row to the session decision log (TSV).
 # Ported from pstack skills/show-me-your-work/scripts/log.sh (MIT).
 # Usage: decision-log.sh [--session <id>] <phase> <todo> <decision> <why> <evidence> <result>
+#        decision-log.sh [--session <id>] --archive
 # Output: ${AGMO_STATE_DIR:-$HOME/.agmo/state}/sessions/<id>/decisions.tsv
+# --archive rotates decisions.tsv to decisions.<UTC ts>.tsv (prints ARCHIVED:<path>),
+# so the next plan starts with a clean log. No data rows -> nothing to archive.
 set -euo pipefail
 
 usage() {
   printf 'usage: decision-log.sh [--session <id>] <phase> <todo> <decision> <why> <evidence> <result>\n' >&2
+  printf '       decision-log.sh [--session <id>] --archive\n' >&2
 }
 
 sid=""
@@ -19,7 +23,10 @@ if [ "${1:-}" = "--session" ]; then
   shift 2
 fi
 
-if [ "$#" -ne 6 ]; then
+archive=0
+if [ "$#" -eq 1 ] && [ "$1" = "--archive" ]; then
+  archive=1
+elif [ "$#" -ne 6 ]; then
   usage
   exit 1
 fi
@@ -42,6 +49,25 @@ case "$sid" in
 esac
 
 logfile="${AGMO_STATE_DIR:-$HOME/.agmo/state}/sessions/${sid}/decisions.tsv"
+
+if [ "$archive" -eq 1 ]; then
+  if [ ! -f "$logfile" ] || [ "$(wc -l < "$logfile")" -le 1 ]; then
+    printf '[decision-log] nothing to archive\n' >&2
+    exit 0
+  fi
+  dir="$(dirname "$logfile")"
+  base="decisions.$(date -u +%Y%m%dT%H%M%SZ)"
+  target="${dir}/${base}.tsv"
+  n=0
+  while [ -e "$target" ]; do
+    n=$((n + 1))
+    target="${dir}/${base}.tsv.${n}"
+  done
+  mv "$logfile" "$target"
+  printf 'ARCHIVED:%s\n' "$target"
+  exit 0
+fi
+
 mkdir -p "$(dirname "$logfile")"
 
 # Use `>>` here, never `>`.

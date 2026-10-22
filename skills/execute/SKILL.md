@@ -169,7 +169,7 @@ After all TODOs are complete:
 
 When architect approves final verification:
 1. Invoke `agmo:save-impl` to save implementation summary to Obsidian
-   save-impl attaches decisions.tsv as a "결정 로그" table when the file has rows.
+   save-impl attaches decisions.tsv as a "결정 로그" table when the file has rows, and then archives it (`decision-log.sh --archive`) so the log is plan-scoped.
 2. If significant learnings occurred, suggest `agmo:wisdom` recording
 3. Report completion to user
 4. If `--panel` was passed → `Skill(skill="agmo:code-review", args="--panel")`. Without it, do not invoke code-review (unchanged).

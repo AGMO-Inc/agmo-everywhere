@@ -21,6 +21,10 @@ Delegate to `archivist` agent (haiku):
      ```bash
      awk -F'\t' 'NR==1{print "| phase | todo | decision | why | evidence | result |"; print "|---|---|---|---|---|---|"; next} {gsub(/\|/,"\\|"); print "| "$2" | "$3" | "$4" | "$5" | "$6" | "$7" |"}' "$DECISIONS_TSV"
      ```
+     Once the table is inserted into the tmpfile, rotate the log so the next plan starts clean (same session id as `DECISIONS_TSV`; prints `ARCHIVED:<path>` or `nothing to archive`; a failure never blocks the save):
+     ```bash
+     bash "${CLAUDE_PLUGIN_ROOT}/scripts/decision-log.sh" --archive
+     ```
 6. **Save** — `scripts/vault-save.sh --type impl --project {PROJECT} --title "{title}" --file /tmp/agmo-vault-{uuid}.md`
    - If `CREATED:` → proceed to step 7
    - If `DUPLICATE:{path}` → **return to orchestrator** with the duplicate path and new content summary. Orchestrator will ask user whether to update or skip.
@@ -42,7 +46,7 @@ Delegate to `archivist` agent (haiku):
     `scripts/wiki-capture.sh --project {PROJECT} --title "{title}" --type impl --source "save-impl" --confidence high --file /tmp/agmo-vault-{uuid}.md`
     - Keep this summary compact; Obsidian implementation notes remain the full human-facing record.
 11. **Cleanup** — `rm /tmp/agmo-vault-{uuid}.md`
-12. **Report** — output saved path, index update, plan backlink status, and whether llm-wiki capture was created
+12. **Report** — output saved path, index update, plan backlink status, whether llm-wiki capture was created, and whether decisions.tsv was archived
 
 ## Vault Path
 

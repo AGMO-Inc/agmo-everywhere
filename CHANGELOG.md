@@ -6,7 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [0.9.0] - 2026-10-22
 
 ### Added
-- 결정 로그 스크립트: TODO마다 phase/todo/decision/why/evidence/result 1행을 세션 로컬 `decisions.tsv`에 append. pstack `skills/show-me-your-work/scripts/log.sh`(MIT) 포팅, bash+awk만 사용, 수식 인젝션 가드 포함 (`scripts/decision-log.sh`)
+- 결정 로그 스크립트: TODO마다 phase/todo/decision/why/evidence/result 1행을 세션 로컬 `decisions.tsv`에 append. pstack `skills/show-me-your-work/scripts/log.sh`(MIT) 포팅, bash+awk만 사용, 수식 인젝션 가드 포함 (`scripts/decision-log.sh`); `--archive`로 save-impl 후 `decisions.<ts>.tsv`로 회전해 결정 로그를 플랜 단위로 유지
 - `handoff` 스킬: "핸드오프", "이어서 할 수 있게 정리해" 시 `resume.md`(intent/progress/verified/next/gotchas) 작성 (`skills/handoff/SKILL.md`)
 - 세션 핸드오프 자동 주입: `source`가 `compact`·`resume`이고 `resume.md`가 있을 때만 `## Session Handoff` 블록(1,500문자 상한, UTF-8 안전 자르기, decisions.tsv 행수 포인터) 주입. startup에서는 미생성 (`hooks/session-start`)
 - 리뷰 판정 참조: 버킷 4개(Act on/Consider/Noted/Dismissed) + 필터 5개 + Agreement Map + 설계 red flags 8개 (`skills/using-plugin/references/review-judgment.md`)

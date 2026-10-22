@@ -98,6 +98,32 @@ assert_no_file "$AGMO_STATE_DIR/decisions.tsv"
 AGMO_SESSION_ID=s2 bash scripts/decision-log.sh plan T1 d w e r >/dev/null
 assert_file "$AGMO_STATE_DIR/sessions/s2/decisions.tsv"
 
+# --- decision-log.sh --archive ---
+ARCH_OUT="$(bash scripts/decision-log.sh --session s1 --archive)"
+case "$ARCH_OUT" in ARCHIVED:*) ;; *) echo "archive stdout: $ARCH_OUT" >&2; exit 1 ;; esac
+ARCH_PATH="${ARCH_OUT#ARCHIVED:}"
+assert_no_file "$AGMO_STATE_DIR/sessions/s1/decisions.tsv"
+assert_file "$ARCH_PATH"
+assert_eq "$(python3 -c "import sys; print(len(open(sys.argv[1]).read().splitlines()))" "$ARCH_PATH")" "3" "archived line count"
+echo "$(basename "$ARCH_PATH")" | grep -Eq '^decisions\.[0-9]{8}T[0-9]{6}Z\.tsv$' || { echo "bad archive name: $ARCH_PATH" >&2; exit 1; }
+
+bash scripts/decision-log.sh --session s1 plan T3 "pick C" "why" "ev" "pass" >/dev/null
+assert_eq "$(python3 -c "import sys; print(len(open(sys.argv[1]).read().splitlines()))" "$AGMO_STATE_DIR/sessions/s1/decisions.tsv")" "2" "fresh log after archive"
+
+set +e
+ARCH_MISSING="$(bash scripts/decision-log.sh --session s9 --archive 2>/dev/null)"
+code=$?
+set -e
+assert_eq "$code" "0" "archive missing file exit code"
+assert_eq "$ARCH_MISSING" "" "archive missing file stdout"
+assert_no_file "$AGMO_STATE_DIR/sessions/s9/decisions.tsv"
+
+set +e
+env -u CLAUDE_CODE_SESSION_ID -u AGMO_SESSION_ID bash scripts/decision-log.sh --archive >/dev/null 2>&1
+code=$?
+set -e
+assert_eq "$code" "0" "archive no session id exit code"
+
 # Wrong arg count.
 set +e
 bash scripts/decision-log.sh --session s5 a b c d e >/dev/null 2>&1
