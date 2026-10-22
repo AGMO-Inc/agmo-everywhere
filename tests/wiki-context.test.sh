@@ -105,6 +105,20 @@ manifest_chars="$(printf '%s' "$manifest_out" | wc -c | tr -d ' ')"
 test "$manifest_chars" -le 800 || { echo "manifest exceeded 800 chars: $manifest_chars" >&2; exit 1; }
 assert_contains "$manifest_out" "API/Auth: token rules?"
 
+# --manifest lists other projects as one line sorted by capture count desc, plus a load hint.
+mkdir -p "$AGMO_VAULT_ROOT/.agmo/llm-wiki/projects/alpha/captures" "$AGMO_VAULT_ROOT/.agmo/llm-wiki/projects/beta/captures"
+printf '# a\n' > "$AGMO_VAULT_ROOT/.agmo/llm-wiki/projects/alpha/captures/a1.md"
+printf '# b\n' > "$AGMO_VAULT_ROOT/.agmo/llm-wiki/projects/beta/captures/b1.md"
+printf '# b\n' > "$AGMO_VAULT_ROOT/.agmo/llm-wiki/projects/beta/captures/b2.md"
+manifest_others="$(bash scripts/wiki-context.sh --project demo --manifest)"
+assert_contains "$manifest_others" "beta(2), alpha(1)"
+assert_contains "$manifest_others" "wiki-context.sh --project <이름>"
+if printf '%s' "$manifest_others" | grep -Eq '^- (alpha|beta) \('; then
+  echo "manifest still uses bullet list for other projects" >&2
+  exit 1
+fi
+rm -rf "$AGMO_VAULT_ROOT/.agmo/llm-wiki/projects/alpha" "$AGMO_VAULT_ROOT/.agmo/llm-wiki/projects/beta"
+
 # --budget with invalid value (non-numeric) exits with code 3.
 set +e
 bash scripts/wiki-context.sh --project demo --budget abc >/dev/null 2>&1
@@ -126,7 +140,7 @@ HOOK_JSON="$hook_json" python3 - <<'PY'
 import json, os
 payload = json.loads(os.environ["HOOK_JSON"])
 ctx = payload["hookSpecificOutput"]["additionalContext"]
-assert "LLM Wiki Context" in ctx
+assert "LLM Wiki Manifest" in ctx
 assert "AGMO_VAULT_ROOT=" in ctx
 PY
 

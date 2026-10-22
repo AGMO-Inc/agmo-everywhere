@@ -144,8 +144,23 @@ if [ "$CODEX_AVAILABLE" = "true" ]; then
   context="${context}"$'\n'"Codex CLI detected. codex-plugin-cc slash commands available: /codex:adversarial-review, /codex:review, /codex:rescue"
 fi
 
+# Session handoff: inject resume.md only when resuming or after compaction
+SOURCE=$(printf '%s' "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('source',''))" 2>/dev/null || echo "")
+RESUME_FILE="${SESSION_STATE_DIR}/resume.md"
+DECISIONS_FILE="${SESSION_STATE_DIR}/decisions.tsv"
+if [ -n "$SESSION_ID" ] && { [ "$SOURCE" = "compact" ] || [ "$SOURCE" = "resume" ]; } && [ -s "$RESUME_FILE" ]; then
+  resume_text=$(python3 -c "import sys; t=open(sys.argv[1],encoding='utf-8',errors='replace').read(); print(t[:1500] + ('\n[truncated]' if len(t)>1500 else ''), end='')" "$RESUME_FILE" 2>/dev/null || echo "")
+  context="${context}"$'\n\n'"## Session Handoff (${SOURCE})"$'\n'"${resume_text}"
+  if [ -s "$DECISIONS_FILE" ]; then
+    rows=$(( $(wc -l < "$DECISIONS_FILE" | tr -d ' ') - 1 ))
+    decision_rows=$(( rows > 0 ? rows : 0 ))
+    context="${context}"$'\n'"decisions.tsv: ${decision_rows}행 (${DECISIONS_FILE}). 필요 시 tail로 읽을 것."
+  fi
+  context="${context}"$'\n'"verified 항목은 재검증하지 않고 next부터 이어간다. resume.md 작성 이후 변경된 파일을 git status로 확인해 겹치는 verified 항목만 재검증한다."
+fi
+
 # Escape for JSON
-escaped_context=$(printf '%s' "$context" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null | sed 's/^"//;s/"$//')
+escaped_context=$(printf '%s' "$context" | python3 -c "import sys,json; print(json.dumps(sys.stdin.buffer.read().decode('utf-8','replace')))" 2>/dev/null | sed 's/^"//;s/"$//')
 
 # Initialize session-stats.json (session_id already extracted above)
 { python3 - "${SESSION_STATE_DIR}/session-stats.json" "$SESSION_ID" "$PROJECT_NAME" "$PWD" 2>/dev/null || true; } <<'PYEOF'

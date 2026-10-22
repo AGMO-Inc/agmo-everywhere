@@ -17,6 +17,14 @@ Delegate to `archivist` agent (haiku):
    - Frontmatter (see `ref/frontmatter-schema.md` impl schema, `ref/impl-template.md` for body template)
    - Link to plan: `plan: "[[{PROJECT}/plans/[Plan] {plan title}]]"`
    - Body includes: implementation summary, changed files, key implementation details, design decisions
+   - **5a. Decision log** — the orchestrator passes `DECISIONS_TSV=${AGMO_STATE_DIR:-$HOME/.agmo/state}/sessions/${CLAUDE_CODE_SESSION_ID}/decisions.tsv` in the dispatch prompt (or `none`). If the file exists with at least one data row, convert it and insert a `## 결정 로그` section before `## 검증 결과`; otherwise omit the section.
+     ```bash
+     awk -F'\t' 'NR==1{print "| phase | todo | decision | why | evidence | result |"; print "|---|---|---|---|---|---|"; next} {gsub(/\|/,"\\|"); print "| "$2" | "$3" | "$4" | "$5" | "$6" | "$7" |"}' "$DECISIONS_TSV"
+     ```
+     Once the table is inserted into the tmpfile, rotate the log so the next plan starts clean (same session id as `DECISIONS_TSV`; prints `ARCHIVED:<path>` or `nothing to archive`; a failure never blocks the save):
+     ```bash
+     bash "${CLAUDE_PLUGIN_ROOT}/scripts/decision-log.sh" --archive
+     ```
 6. **Save** — `scripts/vault-save.sh --type impl --project {PROJECT} --title "{title}" --file /tmp/agmo-vault-{uuid}.md`
    - If `CREATED:` → proceed to step 7
    - If `DUPLICATE:{path}` → **return to orchestrator** with the duplicate path and new content summary. Orchestrator will ask user whether to update or skip.
@@ -38,7 +46,7 @@ Delegate to `archivist` agent (haiku):
     `scripts/wiki-capture.sh --project {PROJECT} --title "{title}" --type impl --source "save-impl" --confidence high --file /tmp/agmo-vault-{uuid}.md`
     - Keep this summary compact; Obsidian implementation notes remain the full human-facing record.
 11. **Cleanup** — `rm /tmp/agmo-vault-{uuid}.md`
-12. **Report** — output saved path, index update, plan backlink status, and whether llm-wiki capture was created
+12. **Report** — output saved path, index update, plan backlink status, whether llm-wiki capture was created, and whether decisions.tsv was archived
 
 ## Vault Path
 

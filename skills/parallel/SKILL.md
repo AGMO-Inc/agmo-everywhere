@@ -46,13 +46,18 @@ If a file is needed by multiple TODOs:
 
 Launch all independent TODOs as separate Agent tool calls in a single response:
 
+Each `prompt` is the execute skill's step 1 brief (GOAL / SCOPE / CONTEXT / ACCEPTANCE / VERIFY / TIMEBOX / FORBIDDEN / REPORT) with three parallel-specific additions:
+- SCOPE `may write` lists only the files this executor owns (step 2).
+- CONTEXT names the files sibling executors are changing right now, so the executor does not read stale versions as truth.
+- FORBIDDEN adds: no edits to files owned by another executor, even to fix an import.
+
 ```
-Agent(subagent_type="agmo:executor", model="sonnet", prompt="TODO 1...")
-Agent(subagent_type="agmo:executor", model="sonnet", prompt="TODO 2...")
-Agent(subagent_type="agmo:executor", model="haiku", prompt="TODO 3...")
+Agent(subagent_type="agmo:executor", model="sonnet", prompt="<brief for TODO 1>")
+Agent(subagent_type="agmo:executor", model="sonnet", prompt="<brief for TODO 2>")
+Agent(subagent_type="agmo:executor", model="haiku", prompt="<brief for TODO 3>")
 ```
 
-Claude Code executes these concurrently when issued in the same message.
+Claude Code executes these concurrently when issued in the same message. After the batch, run the execute skill's step 5 (Record) once per TODO, in TODO order.
 
 ### 5. Integration Phase
 

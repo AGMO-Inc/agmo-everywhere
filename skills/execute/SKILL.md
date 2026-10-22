@@ -19,6 +19,11 @@ When this skill is invoked, ralph is **automatically activated**. The execution 
 
 Read the plan from the vault path provided via skill args (e.g., `--plan-path {VAULT_PATH}`).
 
+Other args:
+- `--panel` → remembered for section 5 (Completion). After save-impl, invoke `Skill(skill="agmo:code-review", args="--panel")`. Without `--panel`, execute does not invoke code-review (unchanged).
+
+**Direct mode:** when the user already has a plan path and a clear, scoped request, start here. No brainstorming or plan skill first.
+
 **Path resolution:**
 1. If `--plan-path` is provided in args → Read the plan directly using Read tool from the vault path
    - The vault path format is an absolute path, e.g.: `agmo-everywhere/plans/[Plan]-제목.md`
@@ -33,21 +38,39 @@ Classify each TODO:
 - **Dependencies**: which TODOs must complete first
 - **Parallelizable**: can this run concurrently with others?
 
+At the end of Load Plan run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/resume-update.sh" intent "{user request + plan path}" next "TODO 1: {title}"` (the full resume.md template stays in `skills/handoff/SKILL.md` for manual handoff; failures here never block).
+
 ### 2. Execute TODOs
 
 For each TODO (respecting dependency order):
 
-```
-1. Dispatch executor agent with appropriate category
+````
+1. Dispatch executor agent with category routing
    - quick (haiku): simple file changes, config updates
    - standard (sonnet): feature implementation, most work
    - complex (opus): complex logic, architectural changes
+   The prompt is this brief. Every field is filled; a field you cannot fill means the TODO is not ready to dispatch.
+   ```
+   GOAL         <one sentence: the outcome, executable by a stranger with no chat access>
+   SCOPE        may write: <TODO File(s)>; may NOT write: <everything else, name known neighbors>
+   CONTEXT      plan: <vault path>; design: <vault path or none>; related files: <paths>;
+                reports of TODOs this one depends on, pasted in full
+   ACCEPTANCE   <one checkable criterion per line, copied from the TODO>
+   VERIFY       <exact commands from the TODO's Acceptance/QA, plus known gotchas>
+   TIMEBOX      <cap as a tool-call budget, e.g. 25 tool calls>; on expiry return partial findings and stop
+   FORBIDDEN    no commits, no pushes, no fixes outside SCOPE, no new dependencies, no tests run (verification's job),
+                plus the TODO's Must NOT lines
+   REPORT       status (DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT); files changed; each ACCEPTANCE line met/unmet with evidence;
+                what you actually ran; deviations; decision (one line: what you chose and why; `none` when the plan was followed as written); follow-ups
+   ```
+   Size the brief to the TODO: a one-file edit collapses to a paragraph that still names GOAL, SCOPE, VERIFY and REPORT.
 
 2. Executor completes the TODO and reports results
 
 3. Auto-trigger agmo:verification
    - If FAIL → collect failure context (approach taken + verification judgment)
    - Retry with accumulated feedback (up to 3 attempts):
+     Retries reuse the same brief; the 이전 시도 block below is appended to CONTEXT.
      Each retry prompt MUST include ALL prior failure context:
      ```
      이전 시도 #{N}:
@@ -66,8 +89,17 @@ For each TODO (respecting dependency order):
      → If CRITICAL issues found → dispatch executor to fix → re-verify from step 3
      → If MINOR only → log summary, mark TODO complete
    - If Tags do not contain `frontend` or `ui`:
-     → Mark TODO complete, proceed to next
-```
+     → Mark TODO complete, proceed to step 5 (Record)
+
+5. Record (after PASS, before the next TODO; failures here never block the TODO)
+   - Write a decision-log.sh row ONLY when at least one signal holds: a retry happened / status is DONE_WITH_CONCERNS / the executor deviated from the plan / the REPORT `decision` line is not `none`; otherwise write no row. Row:
+     `bash "${CLAUDE_PLUGIN_ROOT}/scripts/decision-log.sh" execute "TODO {N}" "{decision}" "{why}" "{verification evidence, one line}" "{DONE|DONE_WITH_CONCERNS}"`
+     On non-zero exit: print one warning line and continue.
+   - `bash "${CLAUDE_PLUGIN_ROOT}/scripts/resume-update.sh" progress "TODO {N}/{M} done" verified "{TODOs passed + evidence cmd}" next "TODO {N+1}: {title} | architect final verification"`; append `gotchas "{failed approach, files not to touch}"` only when a retry or a failed approach occurred in this TODO. Each value at most 2 lines.
+     Decision log = plan-local, automatic, attached to the Impl note by save-impl then archived.
+     wisdom (`agmo:wisdom`, `vault/{project}/wisdom/`) = cross-plan reusable rule, curated by the user.
+     Rows with retries / DONE_WITH_CONCERNS / phase debugging are the wisdom candidates to suggest at Completion step 2.
+````
 
 ### Completion Status
 
@@ -140,8 +172,10 @@ After all TODOs are complete:
 
 When architect approves final verification:
 1. Invoke `agmo:save-impl` to save implementation summary to Obsidian
+   save-impl attaches decisions.tsv as a "결정 로그" table when the file has rows, and then archives it (`decision-log.sh --archive`) so the log is plan-scoped.
 2. If significant learnings occurred, suggest `agmo:wisdom` recording
 3. Report completion to user
+4. If `--panel` was passed → `Skill(skill="agmo:code-review", args="--panel")`. Without it, do not invoke code-review (unchanged).
 
 ## TDD Integration
 
