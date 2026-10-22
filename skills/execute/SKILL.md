@@ -38,7 +38,7 @@ Classify each TODO:
 - **Dependencies**: which TODOs must complete first
 - **Parallelizable**: can this run concurrently with others?
 
-Read `${CLAUDE_PLUGIN_ROOT}/skills/handoff/SKILL.md` once now (Process step 3 holds the resume.md heredoc that Execute TODOs step 5 (Record) below reuses at every TODO boundary).
+At the end of Load Plan run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/resume-update.sh" intent "{user request + plan path}" next "TODO 1: {title}"` (the full resume.md template stays in `skills/handoff/SKILL.md` for manual handoff; failures here never block).
 
 ### 2. Execute TODOs
 
@@ -61,7 +61,7 @@ For each TODO (respecting dependency order):
    FORBIDDEN    no commits, no pushes, no fixes outside SCOPE, no new dependencies, no tests run (verification's job),
                 plus the TODO's Must NOT lines
    REPORT       status (DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT); files changed; each ACCEPTANCE line met/unmet with evidence;
-                what you actually ran; deviations; decision (one line: what you chose and why, feeds the decision log); follow-ups
+                what you actually ran; deviations; decision (one line: what you chose and why; `none` when the plan was followed as written); follow-ups
    ```
    Size the brief to the TODO: a one-file edit collapses to a paragraph that still names GOAL, SCOPE, VERIFY and REPORT.
 
@@ -92,10 +92,13 @@ For each TODO (respecting dependency order):
      → Mark TODO complete, proceed to step 5 (Record)
 
 5. Record (after PASS, before the next TODO; failures here never block the TODO)
-   - One decision row, taken from the executor REPORT's `decision` line:
+   - Write a decision-log.sh row ONLY when at least one signal holds: a retry happened / status is DONE_WITH_CONCERNS / the executor deviated from the plan / the REPORT `decision` line is not `none`; otherwise write no row. Row:
      `bash "${CLAUDE_PLUGIN_ROOT}/scripts/decision-log.sh" execute "TODO {N}" "{decision}" "{why}" "{verification evidence, one line}" "{DONE|DONE_WITH_CONCERNS}"`
      On non-zero exit: print one warning line and continue.
-   - Refresh resume.md with the heredoc from the handoff skill (`skills/handoff/SKILL.md`, Process step 3, read in step 1). Fields: intent = user request + plan path; progress = `TODO {N}/{M} done`; verified = TODOs that passed with the evidence command; next = `TODO {N+1}: {title}` or `architect final verification`; gotchas = failed approaches from retries, files not to touch. Each field at most 2 lines.
+   - `bash "${CLAUDE_PLUGIN_ROOT}/scripts/resume-update.sh" progress "TODO {N}/{M} done" verified "{TODOs passed + evidence cmd}" next "TODO {N+1}: {title} | architect final verification"`; append `gotchas "{failed approach, files not to touch}"` only when a retry or a failed approach occurred in this TODO. Each value at most 2 lines.
+     Decision log = plan-local, automatic, attached to the Impl note by save-impl then archived.
+     wisdom (`agmo:wisdom`, `vault/{project}/wisdom/`) = cross-plan reusable rule, curated by the user.
+     Rows with retries / DONE_WITH_CONCERNS / phase debugging are the wisdom candidates to suggest at Completion step 2.
 ````
 
 ### Completion Status

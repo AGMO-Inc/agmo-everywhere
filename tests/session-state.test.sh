@@ -196,4 +196,25 @@ assert_contains "$(printf '%s' "$out" | ctx)" "decisions.tsv: 0행"
 # T4 adds skills/handoff and bumps plugin.json to 31 in the same change; before T4 this is 30 = 30
 [ "$(ls skills | wc -l | tr -d ' ')" = "$(grep -o '[0-9]* demand-loaded skills' .claude-plugin/plugin.json | grep -o '^[0-9]*')" ] || { echo "skill count out of sync with plugin.json" >&2; exit 1; }
 
+# --- resume-update.sh ---
+RU="$AGMO_STATE_DIR/sessions/r1/resume.md"
+bash scripts/resume-update.sh --session r1 intent "plan X" next "TODO 1" >/dev/null
+assert_file "$RU"
+assert_eq "$(wc -l < "$RU" | tr -d ' ')" "6" "resume create line count"
+assert_eq "$(sed -n 2p "$RU")" "- intent: plan X" "resume create intent"
+assert_eq "$(sed -n 3p "$RU")" "- progress: -" "resume create progress default"
+assert_eq "$(sed -n 5p "$RU")" "- next: TODO 1" "resume create next"
+bash scripts/resume-update.sh --session r1 progress "TODO 1/3 done" >/dev/null
+assert_eq "$(sed -n 3p "$RU")" "- progress: TODO 1/3 done" "resume patch progress"
+assert_eq "$(sed -n 2p "$RU")" "- intent: plan X" "resume patch keeps intent"
+assert_eq "$(sed -n 5p "$RU")" "- next: TODO 1" "resume patch keeps next"
+assert_eq "$(wc -l < "$RU" | tr -d ' ')" "6" "resume patch line count"
+bash scripts/resume-update.sh --session r1 gotchas $'a\nb\tc' >/dev/null
+assert_eq "$(sed -n 6p "$RU")" "- gotchas: a b c" "resume sanitizes whitespace"
+set +e; env -u CLAUDE_CODE_SESSION_ID -u AGMO_SESSION_ID bash scripts/resume-update.sh intent x >/dev/null 2>&1; code=$?; set -e
+assert_eq "$code" "0" "resume no session exits 0"
+assert_no_file "$AGMO_STATE_DIR/sessions/resume.md"
+set +e; bash scripts/resume-update.sh --session r1 bogus x >/dev/null 2>&1; code=$?; set -e
+assert_eq "$code" "1" "resume unknown field exits 1"
+
 echo "session-state tests passed"

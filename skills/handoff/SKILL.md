@@ -25,6 +25,7 @@ Writes `resume.md` into the session state directory so the next session (or this
    - gotchas: <traps, failed approaches, files not to touch>
    EOF
    ```
+   For single-field updates use `bash "${CLAUDE_PLUGIN_ROOT}/scripts/resume-update.sh" <field> <value>` instead of rewriting the file (execute / ralph call it at every TODO boundary).
 4. If `CLAUDE_CODE_SESSION_ID` is empty, report that no session id is available and print the resume content in the reply instead of writing the file.
 
 ## Output

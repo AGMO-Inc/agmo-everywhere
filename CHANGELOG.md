@@ -6,16 +6,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [0.9.0] - 2026-10-22
 
 ### Added
-- 결정 로그 스크립트: TODO마다 phase/todo/decision/why/evidence/result 1행을 세션 로컬 `decisions.tsv`에 append. pstack `skills/show-me-your-work/scripts/log.sh`(MIT) 포팅, bash+awk만 사용, 수식 인젝션 가드 포함 (`scripts/decision-log.sh`); `--archive`로 save-impl 후 `decisions.<ts>.tsv`로 회전해 결정 로그를 플랜 단위로 유지
+- 결정 로그 스크립트: 신호가 있는 TODO마다 phase/todo/decision/why/evidence/result 1행을 세션 로컬 `decisions.tsv`에 append. pstack `skills/show-me-your-work/scripts/log.sh`(MIT) 포팅, bash+awk만 사용, 수식 인젝션 가드 포함 (`scripts/decision-log.sh`); `--archive`로 save-impl 후 `decisions.<ts>.tsv`로 회전해 결정 로그를 플랜 단위로 유지. 행은 신호(retry / DONE_WITH_CONCERNS / 플랜 이탈 / decision ≠ none)가 있을 때만 기록하며, 결정 로그(플랜 로컬·자동)와 wisdom(플랜 횡단·큐레이션)의 경계를 execute 스킬에 명시
 - `handoff` 스킬: "핸드오프", "이어서 할 수 있게 정리해" 시 `resume.md`(intent/progress/verified/next/gotchas) 작성 (`skills/handoff/SKILL.md`)
 - 세션 핸드오프 자동 주입: `source`가 `compact`·`resume`이고 `resume.md`가 있을 때만 `## Session Handoff` 블록(1,500문자 상한, UTF-8 안전 자르기, decisions.tsv 행수 포인터) 주입. startup에서는 미생성 (`hooks/session-start`)
 - 리뷰 판정 참조: 버킷 4개(Act on/Consider/Noted/Dismissed) + 필터 5개 + Agreement Map + 설계 red flags 8개 (`skills/using-plugin/references/review-judgment.md`)
 - 원칙 인덱스 10개, 결정 근거가 필요할 때만 로드 (`skills/using-plugin/references/principles.md`)
-- code-review `--panel` opt-in: critic ∥ architect(또는 codex) 병렬 리뷰 후 오케스트레이터가 버킷으로 합성. 기본 경로 에이전트 호출 수 불변 (`skills/code-review/SKILL.md`)
+- code-review `--panel` opt-in: critic ∥ architect(또는 codex) 병렬 리뷰 후 오케스트레이터가 버킷으로 합성. 기본 경로 에이전트 호출 수 불변. codex 리뷰어 실패(400/timeout) 시 architect로 대체 디스패치, diff ≥ 50줄 또는 auth/data/payment 경로일 때 권장 (`skills/code-review/SKILL.md`)
 - 세션 상태 회귀 테스트, 스킬 디렉터리 수 = plugin.json 스킬 수 assert 포함 (`tests/session-state.test.sh`)
+- `scripts/resume-update.sh`: resume.md 5개 필드(intent/progress/verified/next/gotchas)를 개별 패치. 세션 id 해석·skip 동작은 decision-log.sh와 동일, 1,200자 초과 시 경고 (`tests/session-state.test.sh` 5케이스 추가)
 
 ### Changed
-- executor 디스패치 브리프를 GOAL/SCOPE/CONTEXT/ACCEPTANCE/VERIFY/TIMEBOX/FORBIDDEN/REPORT 8필드로 고정(TIMEBOX는 툴 호출 수 상한), TODO 완료마다 결정 로그 1행·resume.md 갱신. Direct 모드 설명을 using-plugin에서 execute로 이동 (`skills/execute/SKILL.md`, `skills/ralph/SKILL.md`, `skills/parallel/SKILL.md`)
+- executor 디스패치 브리프를 GOAL/SCOPE/CONTEXT/ACCEPTANCE/VERIFY/TIMEBOX/FORBIDDEN/REPORT 8필드로 고정(TIMEBOX는 툴 호출 수 상한), TODO 완료마다 신호 있을 때만 결정 로그 1행, resume.md는 heredoc 재작성 대신 `scripts/resume-update.sh` 필드 패치. Direct 모드 설명을 using-plugin에서 execute로 이동 (`skills/execute/SKILL.md`, `skills/ralph/SKILL.md`, `skills/parallel/SKILL.md`)
 - critic이 발견마다 버킷을 자체 부여하고 플랜 리뷰에서 red flags 8개를 점검 (`agents/critic.md`)
 - executor 주석 규칙: 허용 예외 5개 밖 주석 금지, 단계 서술 주석 금지, 정확성 억제 주석은 원인 수정 우선. `// debt:` 예외 유지 (`agents/executor.md`). code-review Stage 1에 주석 정리(Cleanup) 항목 추가(예외 목록은 executor Rule 3 참조)
 - debugging: 실제 surface 재현, 가설 이진탐색, 반박된 가설이 만든 변경 revert, "might help" 변경 금지, 3회 실패 시 attack-the-premise → architect → codex rescue (`skills/debugging/SKILL.md`)

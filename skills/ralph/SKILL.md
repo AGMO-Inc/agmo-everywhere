@@ -32,7 +32,7 @@ WHILE work remains:
      - If 3 failures → invoke debugging skill (include all 3 failure contexts)
      - If debugging resolves → continue
      - If debugging fails → report to user, pause
-  4b. After verification PASS → run the execute skill's step 5 (Record): one decision-log.sh row + resume.md refresh. A failure here prints one warning and never stops the loop.
+  4b. After verification PASS → run the execute skill's step 5 (Record): a decision-log.sh row only on a signal (retry / DONE_WITH_CONCERNS / deviation / decision ≠ none) + `resume-update.sh` field patch (progress / verified / next). A failure here prints one warning and never stops the loop.
   5. If all TODOs complete → run final verification (architect)
   6. If final verification passes → EXIT LOOP
   7. If final verification fails → address issues, re-verify
@@ -62,4 +62,4 @@ No complex JSON state files — progress is tracked in conversation context.
 3. **3-fix limit per TODO** — escalate to debugging after 3 failures
 4. **Report progress** — after each TODO, briefly state progress (e.g., "3/8 TODO 완료")
 5. **Respect cancel** — immediately stop when user requests cancellation
-6. **Record every verified TODO** — one decisions.tsv row and a resume.md refresh per loop iteration (same rule as execute). Resume from resume.md `next` after /compact; do not re-verify `verified` items.
+6. **Record every verified TODO** — decisions.tsv row only when a signal occurred, and a `resume-update.sh` patch per loop iteration (same rule as execute). Resume from resume.md `next` after /compact; do not re-verify `verified` items.

@@ -12,7 +12,9 @@ Code review happens in two separated stages. This separation prevents mixing con
 ## Arguments
 
 - (none) → Stage 2 runs critic alone. Default path; agent call count unchanged.
-- `--panel` → Stage 2 runs two reviewers in one message: `Agent(subagent_type="agmo:critic", prompt=<Stage 2 brief>)` and a second reviewer. Read `hud.json` (`${AGMO_STATE_DIR:-$HOME/.agmo/state}/sessions/${CLAUDE_CODE_SESSION_ID}/hud.json`) → `codex` field: `true` → `Agent(subagent_type="codex:codex-rescue", prompt=<Stage 2 brief, ask for findings with severity>)`; `false` or unreadable → `Agent(subagent_type="agmo:architect", prompt=<Stage 2 brief>)` and add one line to the report: `Panel: critic + architect (codex unavailable)`. If one reviewer fails or times out, downgrade to the single remaining review and state it in the report.
+- `--panel` → Stage 2 runs two reviewers in one message: `Agent(subagent_type="agmo:critic", prompt=<Stage 2 brief>)` and a second reviewer. Read `hud.json` (`${AGMO_STATE_DIR:-$HOME/.agmo/state}/sessions/${CLAUDE_CODE_SESSION_ID}/hud.json`) → `codex` field: `true` → `Agent(subagent_type="codex:codex-rescue", prompt=<Stage 2 brief, ask for findings with severity>)`; `false` or unreadable → `Agent(subagent_type="agmo:architect", prompt=<Stage 2 brief>)` and add one line to the report: `Panel: critic + architect (codex unavailable)`. If the codex reviewer fails (error / 400 / timeout) → dispatch `Agent(subagent_type="agmo:architect", prompt=<same Stage 2 brief>)` and report `Panel: critic + architect (codex unavailable)`; if the critic fails → report `Panel: single (one reviewer failed: critic)`.
+
+`--panel` is worth its cost when the diff is ≥ 50 lines or touches auth / data / payment paths; below that the default single critic is enough.
 
 ## Stage 1: Spec Compliance
 
