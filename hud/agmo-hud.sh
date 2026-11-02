@@ -9,8 +9,48 @@ AGMO_STATE_DIR="${AGMO_STATE_DIR:-${HOME}/.agmo/state}"
 # --- Read stdin from Claude Code (contains context_window info) ---
 STDIN_JSON=$(cat 2>/dev/null || echo "{}")
 
-# Extract session_id for session-isolated state
-SESSION_ID=$(echo "$STDIN_JSON" | python3 -c "import json,sys; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null || echo "")
+export HUD_STDIN="$STDIN_JSON"
+PARSED=$(python3 -c "
+import json, os, datetime, time
+def fmt(ep):
+  try:
+    t = int(float(ep) - time.time())
+    if t <= 0: return '0m'
+    if t < 3600: return '%dm' % (t // 60)
+    if t < 86400: return '%dh%dm' % (t // 3600, (t % 3600) // 60)
+    return '%dd%dh' % (t // 86400, (t % 86400) // 3600)
+  except Exception: return '?'
+def load(p):
+  try: return json.load(open(p)) or {}
+  except Exception: return {}
+try: d = json.loads(os.environ.get('HUD_STDIN') or '{}') or {}
+except Exception: d = {}
+if not isinstance(d, dict): d = {}
+m = d.get('model') if isinstance(d.get('model'), dict) else {}
+mid = m.get('id', '') or ''
+st = load(os.path.expanduser('~/.claude/settings.json'))
+ms = st.get('modelSettings') if isinstance(st.get('modelSettings'), dict) else {}
+e = d.get('effort') if isinstance(d.get('effort'), dict) else {}
+eff = e.get('level', '') or ''
+if not eff and isinstance(ms.get(mid), dict): eff = ms[mid].get('effortLevel', '') or ''
+if not eff: eff = st.get('effortLevel', '') or ''
+cw = d.get('context_window') if isinstance(d.get('context_window'), dict) else {}
+pct = cw.get('used_percentage')
+ctx = ''
+if pct is not None: ctx = str(int(round(pct)))
+else:
+  u = cw.get('current_usage') or {}
+  tot = u.get('input_tokens', 0) + u.get('cache_creation_input_tokens', 0) + u.get('cache_read_input_tokens', 0)
+  sz = cw.get('context_window_size', 0) or 0
+  if sz > 0: ctx = str(int(round(tot / sz * 100)))
+rl = d.get('rate_limits') if isinstance(d.get('rate_limits'), dict) else {}
+def win(k):
+  w = rl.get(k)
+  if not isinstance(w, dict) or w.get('used_percentage') is None: return ['', '']
+  return [str(int(round(w['used_percentage']))), fmt(w.get('resets_at'))]
+print('|'.join([str(d.get('session_id', '') or ''), mid, str(m.get('display_name', '') or ''), eff, ctx] + win('five_hour') + win('seven_day')))
+" 2>/dev/null || echo "||||||||")
+IFS='|' read -r SESSION_ID MODEL_ID MODEL_NAME EFFORT CTX H5_PCT H5_RESET WK_PCT WK_RESET <<< "$PARSED"
 if [ -n "$SESSION_ID" ]; then
   STATE_DIR="${AGMO_STATE_DIR}/sessions/${SESSION_ID}"
 else
@@ -49,28 +89,40 @@ try:
   print(s if s else '')
 except Exception: print('')
 " 2>/dev/null || echo "")
-  ACTIVE_AGENTS=$(python3 -c "
-import json
+  ACTIVE_AGENTS=$(STATE_DIR="$STATE_DIR" MODEL_ID="$MODEL_ID" EFFORT="$EFFORT" python3 -c "
+import json, os
 try:
-  d=json.load(open('${STATE_DIR}/hud.json'))
-  agents=d.get('agents',[])
+  d = json.load(open(os.path.join(os.environ['STATE_DIR'], 'hud.json')))
+  agents = d.get('agents', [])
   if not agents: print('-')
   else:
-    counts={}
+    try: st = json.load(open(os.path.expanduser('~/.claude/settings.json'))) or {}
+    except Exception: st = {}
+    ms = st.get('modelSettings') if isinstance(st.get('modelSettings'), dict) else {}
+    main_eff = os.environ.get('EFFORT', '')
+    mid = os.environ.get('MODEL_ID', '')
+    fams = ('haiku', 'sonnet', 'opus', 'fable')
+    def eff_for(alias):
+      for k, v in ms.items():
+        if alias in k and isinstance(v, dict) and v.get('effortLevel'):
+          return v['effortLevel']
+      return st.get('effortLevel', '') or ''
+    counts = {}
     for a in agents:
-      m=a.get('model','')
-      key=f\"{a['name']}:{m}\" if m else a['name']
-      counts[key]=counts.get(key,0)+1
-    parts=[f'{k}×{v}' if v>1 else k for k,v in counts.items()]
-    print(' '.join(parts))
+      m = a.get('model', '') or ''
+      if m:
+        e = eff_for(m)
+      else:
+        m = next((f for f in fams if f in mid), '')
+        e = main_eff
+      key = a['name'] + (':' + m if m else '') + ('(' + e + ')' if m and e else '')
+      counts[key] = counts.get(key, 0) + 1
+    print(' '.join(k + '×' + str(v) if v > 1 else k for k, v in counts.items()))
 except Exception: print('-')
 " 2>/dev/null || echo "-")
 fi
 
 # --- Rate limit from Anthropic OAuth API ---
-RATE_5H=""
-RATE_WK=""
-CTX=""
 
 # ANSI colors
 C_GREEN=$'\x1b[32m'
@@ -92,56 +144,32 @@ color_by_pct() {
 }
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-USAGE_JSON=$(python3 "${SCRIPT_DIR}/usage-api.py" 2>/dev/null || echo '{"error":true}')
-
-if echo "$USAGE_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); sys.exit(1 if d.get('error') else 0)" 2>/dev/null; then
-  RATE_5H=$(echo "$USAGE_JSON" | python3 -c "
-import json,sys
-d=json.load(sys.stdin)
-print(f\"{d['5h_pct']}|{d['5h_reset']}\")
-" 2>/dev/null || echo "")
-  RATE_WK=$(echo "$USAGE_JSON" | python3 -c "
-import json,sys
-d=json.load(sys.stdin)
-print(f\"{d['wk_pct']}|{d['wk_reset']}\")
-" 2>/dev/null || echo "")
+if [ -z "$H5_PCT" ] && [ -z "$WK_PCT" ]; then
+  USAGE_PARSED=$(python3 "${SCRIPT_DIR}/usage-api.py" 2>/dev/null | python3 -c "
+import json, sys
+try:
+  d = json.load(sys.stdin)
+  if d.get('error'): raise ValueError
+  print('|'.join(str(d.get(k, '')) for k in ('5h_pct', '5h_reset', 'wk_pct', 'wk_reset')))
+except Exception: print('|||')
+" 2>/dev/null || echo "|||")
+  IFS='|' read -r H5_PCT H5_RESET WK_PCT WK_RESET <<< "$USAGE_PARSED"
 fi
 
-# Apply colors to rate limit values
 RATE_5H_COLORED=""
 RATE_WK_COLORED=""
-if [ -n "$RATE_5H" ]; then
-  H5_PCT=$(echo "$RATE_5H" | cut -d'|' -f1)
-  H5_RESET=$(echo "$RATE_5H" | cut -d'|' -f2)
+if [ -n "$H5_PCT" ]; then
   H5_COLOR=$(color_by_pct "$H5_PCT")
   RATE_5H_COLORED="${H5_COLOR}${H5_PCT}%${C_RESET}${C_DIM}(${H5_RESET})${C_RESET}"
 fi
-if [ -n "$RATE_WK" ]; then
-  WK_PCT=$(echo "$RATE_WK" | cut -d'|' -f1)
-  WK_RESET=$(echo "$RATE_WK" | cut -d'|' -f2)
+if [ -n "$WK_PCT" ]; then
   WK_COLOR=$(color_by_pct "$WK_PCT")
   RATE_WK_COLORED="${WK_COLOR}${WK_PCT}%${C_RESET}${C_DIM}(${WK_RESET})${C_RESET}"
 fi
 
-# Context usage from Claude Code stdin
-CTX=$(echo "$STDIN_JSON" | python3 -c "
-import json,sys,math
-try:
-  d=json.load(sys.stdin)
-  cw=d.get('context_window',{})
-  pct=cw.get('used_percentage')
-  if pct is not None:
-    print(int(round(pct)))
-  else:
-    usage=cw.get('current_usage',{})
-    total=usage.get('input_tokens',0)+usage.get('cache_creation_input_tokens',0)+usage.get('cache_read_input_tokens',0)
-    size=cw.get('context_window_size',0)
-    if size>0: print(int(round(total/size*100)))
-except Exception: pass
-" 2>/dev/null || echo "")
-
 # --- Read plugin version & codex status from hud.json ---
 PLUGIN_VERSION_PREFIX=""
+_CODEX="false"
 if [ -f "${STATE_DIR}/hud.json" ]; then
   _PV=$(STATE_DIR="$STATE_DIR" python3 -c "
 import json, os
@@ -170,6 +198,10 @@ LINE2=""
 # Line 1: ⏱ rate limits | 📐 ctx | 📂 project
 if [ -n "$RATE_5H_COLORED" ] && [ -n "$RATE_WK_COLORED" ]; then
   LINE1="${PLUGIN_VERSION_PREFIX}🔋 5h:${RATE_5H_COLORED} wk:${RATE_WK_COLORED}"
+elif [ -n "$RATE_WK_COLORED" ]; then
+  LINE1="${PLUGIN_VERSION_PREFIX}🔋 wk:${RATE_WK_COLORED}"
+elif [ -n "$RATE_5H_COLORED" ]; then
+  LINE1="${PLUGIN_VERSION_PREFIX}🔋 5h:${RATE_5H_COLORED}"
 else
   LINE1="${PLUGIN_VERSION_PREFIX}🔋 ${C_DIM}-${C_RESET}"
 fi
@@ -183,24 +215,6 @@ PROJECT_LABEL="${C_BLUE}📂 ${PROJECT}${C_RESET}"
 if [ -n "$BRANCH" ]; then
   PROJECT_LABEL="${C_BLUE}📂 ${PROJECT}(${BRANCH})${C_RESET}"
 fi
-
-# Read model and effort from stdin JSON and settings
-MODEL_NAME=$(echo "$STDIN_JSON" | python3 -c "
-import json,sys
-try:
-  d=json.load(sys.stdin)
-  m=d.get('model',{})
-  print(m.get('display_name','') if isinstance(m,dict) else '')
-except Exception: print('')
-" 2>/dev/null || echo "")
-
-EFFORT=$(python3 -c "
-import json
-try:
-  d=json.load(open('${HOME}/.claude/settings.json'))
-  print(d.get('effortLevel',''))
-except Exception: print('')
-" 2>/dev/null || echo "")
 
 if [ -n "$ACTIVE_SKILL_NAME" ]; then
   LINE2="${PROJECT_LABEL}  🎯 [${C_MAGENTA}${ACTIVE_SKILL_NAME}${C_RESET}]  ⚡ ${C_YELLOW}${ACTIVE_AGENTS}${C_RESET}"
