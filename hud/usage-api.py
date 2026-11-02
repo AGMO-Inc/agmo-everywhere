@@ -178,21 +178,17 @@ def format_reset_time(resets_at: str) -> str:
 
 
 def _build_output(data: dict) -> dict:
-    five_hour = data.get("five_hour", {})
-    seven_day = data.get("seven_day", {})
-
-    five_util = five_hour.get("utilization", 0) or 0
-    seven_util = seven_day.get("utilization", 0) or 0
-    # API returns 0-1 fraction or 0-100 percentage; normalize to 0-100
-    five_pct = five_util * 100 if five_util <= 1 else five_util
-    seven_pct = seven_util * 100 if seven_util <= 1 else seven_util
-
-    return {
-        "5h_pct": round(min(five_pct, 100)),
-        "5h_reset": format_reset_time(five_hour.get("resets_at", "")),
-        "wk_pct": round(min(seven_pct, 100)),
-        "wk_reset": format_reset_time(seven_day.get("resets_at", "")),
-    }
+    out: dict = {}
+    for key, prefix in (("five_hour", "5h"), ("seven_day", "wk")):
+        window = data.get(key) or {}
+        if not isinstance(window, dict) or not window:
+            continue
+        util = window.get("utilization", 0) or 0
+        # API returns 0-1 fraction or 0-100 percentage; normalize to 0-100
+        pct = util * 100 if util <= 1 else util
+        out[f"{prefix}_pct"] = round(min(pct, 100))
+        out[f"{prefix}_reset"] = format_reset_time(window.get("resets_at", ""))
+    return out
 
 
 def main() -> None:
