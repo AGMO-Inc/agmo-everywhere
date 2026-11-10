@@ -9,6 +9,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - 모델 고정 에이전트 frontmatter를 버전 명시 pin에서 alias로 전환: planner·critic `claude-fable-5-1` → `fable`, architect·frontend·android-specialist `claude-opus-5-5` → `opus` (`agents/planner.md`, `agents/critic.md`, `agents/architect.md`, `agents/frontend.md`, `agents/android-specialist.md`)
 - 버전 0.9.1 (plugin.json / marketplace.json / README)
 
+### Fixed
+- `identify-project.sh`가 점(.) 포함 레포명을 원본 URL/local 폴백으로 오판하던 sed 문자 클래스 수정, 회귀 테스트 추가 (`scripts/identify-project.sh`, `tests/identify-project.test.sh`, #27)
+- HUD 주간 사용량 미표기 및 모델/effort 표기 불일치 수정 (`hud/agmo-hud.sh`, `hud/usage-api.py`, #28): statusline stdin의 `rate_limits`를 우선 사용하고 없을 때만 usage API로 폴백, usage API `five_hour: null` 응답 크래시 수정(존재하는 창만 표시), 메인 세션 effort를 stdin `effort.level` → `modelSettings[model.id]` → 전역 `effortLevel` 순으로 결정, 에이전트 라벨을 `name:model(effort)`로 표기(inherit 에이전트는 메인 세션 기준), `hud.json` 부재 시 `_CODEX` 미정의로 `set -u` 중단되던 문제 수정
+
 ### Notes
 - 0.8.6부터 유지한 "frontmatter는 alias 대신 명시 pin" 정책을 번복. 사유: 신모델마다 pin 교체 릴리즈를 내야 하는 부담 제거. alias는 설치된 CLI의 내장 카탈로그 기준 최신 모델로 해석되므로 CLI 업데이트만으로 따라감
 - CLI 2.1.321 headless `claude -p --model <alias>` 실측: `fable` → `claude-fable-5-2`, `opus` → `claude-opus-5-5` (first-party). 0.8.7 당시 CLI 2.1.258에서는 `fable` → `claude-fable-5-1`
