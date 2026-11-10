@@ -3,6 +3,18 @@
 All notable changes to the agmo Claude Code plugin are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.9.1] - 2026-11-10
+
+### Changed
+- 모델 고정 에이전트 frontmatter를 버전 명시 pin에서 alias로 전환: planner·critic `claude-fable-5-1` → `fable`, architect·frontend·android-specialist `claude-opus-5-5` → `opus` (`agents/planner.md`, `agents/critic.md`, `agents/architect.md`, `agents/frontend.md`, `agents/android-specialist.md`)
+- 버전 0.9.1 (plugin.json / marketplace.json / README)
+
+### Notes
+- 0.8.6부터 유지한 "frontmatter는 alias 대신 명시 pin" 정책을 번복. 사유: 신모델마다 pin 교체 릴리즈를 내야 하는 부담 제거. alias는 설치된 CLI의 내장 카탈로그 기준 최신 모델로 해석되므로 CLI 업데이트만으로 따라감
+- CLI 2.1.321 headless `claude -p --model <alias>` 실측: `fable` → `claude-fable-5-2`, `opus` → `claude-opus-5-5` (first-party). 0.8.7 당시 CLI 2.1.258에서는 `fable` → `claude-fable-5-1`
+- 트레이드오프: 실제 모델이 사용자별 CLI 버전·provider에 종속됨. gateway/foundry provider는 alias를 다른(구) 버전으로 해석할 수 있음 (0.8.6·0.8.7 Notes 참고)
+- 스킬/라우팅 문서와 HUD 훅은 이미 일반 별칭(`fable`/`opus`) 기준이라 변경 없음
+
 ## [0.9.0] - 2026-10-22
 
 ### Added
